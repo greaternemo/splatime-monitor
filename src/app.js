@@ -4,7 +4,6 @@
  * hurk!
  */
 
-var ajax =  require('ajax');
 var Settings = require('settings');
 var UI = require('ui');
 var Vector2 = require('vector2');
@@ -15,38 +14,14 @@ var RR = function() {
     return regularRotation;
 };
 
-var Holding = function () {
-    this.value = null;
-};
-
-var holder = new Holding();
-
-var getMaps = function(holder) {
-
-    var iResponse = holder;
+var getMaps = function() {
     
-    ajax(
-        {
-            url: 'http://splatoon.ink/schedule.json',
-            type: 'json',
-            method: 'GET',
-        },
-        function(data, status, request) {
-            console.log("response successful");
-            console.log(data.schedule[0].toString());
-            console.log("data: " + data);
-            iResponse.schedule = data.schedule;
-            console.log(iResponse.schedule[0].ranked.rulesEN);
-        },
-        function(data, status, request) {
-            console.log("response failure");
-            console.log("data: " +  data);
-            console.log("status: " + status);
-            console.log("request: " + request);
-        }
-    );
-    
-    console.log(iResponse.schedule[0].ranked.rulesEN);
+    var xhReq = new XMLHttpRequest();
+    xhReq.open('GET', 'http://splatoon.ink/schedule.json', false);
+    xhReq.send(null);
+    var iResponse = JSON.parse(xhReq.responseText);
+    console.log(iResponse);
+    console.log("response: " + iResponse);
     
     var inkNum = 0;
     for (inkNum = 0; inkNum < iResponse.schedule.length; inkNum++) {
@@ -60,7 +35,7 @@ var getMaps = function(holder) {
     return iResponse;
 };
 
-var inkResponse = getMaps(holder);
+var inkResponse = getMaps();
 
 
 // This is a bit of future-proofing. If Ninty adds alternate modes to Random
@@ -137,11 +112,11 @@ inkData.prototype.processInkResponse = function(iResp) {
             startTime: null,
             endTime: null,
             regular: {
-                maps: [],
+                maps: ["", ""],
                 rules: "",
             },
             ranked: {
-                maps: [],
+                maps: ["", ""],
                 rules: "",
             },
         };
@@ -158,9 +133,11 @@ inkData.prototype.processInkResponse = function(iResp) {
         for (var iMap = 0; iMap < data.schedule.length; iMap++) {
             mapBase.startTime = data.schedule[iMap].startTime;
             mapBase.endTime = data.schedule[iMap].endTime;
-            mapBase.regular.maps = data.schedule[iMap].regular.maps;
+            mapBase.regular.maps[0] = data.schedule[iMap].regular.maps[0].nameEN;
+            mapBase.regular.maps[1] = data.schedule[iMap].regular.maps[1].nameEN;
             mapBase.regular.rules = data.schedule[iMap].regular.rulesEN;
-            mapBase.ranked.maps = data.schedule[iMap].ranked.maps;
+            mapBase.ranked.maps[0] = data.schedule[iMap].ranked.maps[0].nameEN;
+            mapBase.ranked.maps[1] = data.schedule[iMap].ranked.maps[1].nameEN;
             mapBase.ranked.rules = data.schedule[iMap].ranked.rulesEN;
             newData.push(mapBase);
         }
@@ -223,7 +200,7 @@ inkData.prototype.processInkResponse = function(iResp) {
 };
 
 var splatime = new inkData();
-inkData.processInkResponse(inkResponse);
+splatime.processInkResponse(inkResponse);
 
 //var monitor = new UI.Window({
 //    fullscreen: true,
@@ -231,7 +208,7 @@ inkData.processInkResponse(inkResponse);
 var monitor = new UI.Card({
     title: 'Splatime!',
     subtitle: 'TW maps:',
-    body: splatime.currMaps.maps[0] + ", " + splatime.currMaps[1],
+    body: splatime.currMaps.regular.maps[0] + ", " + splatime.currMaps.regular.maps[1],
 });
 
 monitor.show();
