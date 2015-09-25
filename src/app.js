@@ -14,30 +14,6 @@ var RR = function() {
     return regularRotation;
 };
 
-var getMaps = function() {
-    
-    var xhReq = new XMLHttpRequest();
-    xhReq.open('GET', 'http://splatoon.ink/schedule.json', false);
-    xhReq.send(null);
-    var iResponse = JSON.parse(xhReq.responseText);
-    console.log(iResponse);
-    console.log("response: " + iResponse);
-    
-    var inkNum = 0;
-    for (inkNum = 0; inkNum < iResponse.schedule.length; inkNum++) {
-        if (iResponse.schedule[inkNum].regular.hasOwnProperty("rulesEN")) {
-        }
-        else {
-            iResponse.schedule[inkNum].regular.rulesEN = "Turf War";
-        }
-    }
-    
-    return iResponse;
-};
-
-var inkResponse = getMaps();
-
-
 // This is a bit of future-proofing. If Ninty adds alternate modes to Random
 // matches in the future, they will presumably be formatted the same way as
 // the Ranked rules data is now. This will catch the alternate rules data if
@@ -54,6 +30,23 @@ var scheduledMaps = function() {
         maps: [],
         rules: "",
     };
+};
+
+scheduledMaps.prototype.formatTime = function(time) {
+    var timeString = "";
+    console.log(time.toLocaleTimeString());
+    console.log(time.getHours());
+    
+    if (time.getHours() > 12) {
+        timeString = time.getHours()-12 + " PM";
+    }
+    else if (time.getHours() === 0) {
+        timeString = "12 AM";
+    }
+    else {
+        timeString = time.getHours() + " AM";
+    }
+    return timeString;
 };
 
 scheduledMaps.prototype.update = function() {};
@@ -78,14 +71,16 @@ scheduledMaps.prototype.consume = function(mapsData) {
     }
 };
 
-scheduledMaps.prototype.start = function() {};
-scheduledMaps.prototype.end = function() {};
+//scheduledMaps.prototype.start = function() {};
+//scheduledMaps.prototype.end = function() {};
 
 
-var inkData = function() {
+var Monitor = function() {
     this.state = {
+        request: null,
         waiting: true,
         waitingFor: "startup",
+        rotation: "standard",
     };
         
     this.mapState = {
@@ -102,12 +97,39 @@ var inkData = function() {
     
 };
 
-console.log(inkResponse);
+Monitor.prototype.getMaps = function() {
+    
+    var xhReq = new XMLHttpRequest();
+    xhReq.open('GET', 'http://splatoon.ink/schedule.json', false);
+    xhReq.send(null);
+    
+    if (xhReq.status == 200) {
+        console.log("Success - Request to splatoon.ink API returned status 200.");
+        this.state.request = xhReq.status;
+    }
+    else if (xhReq.status !== 200) {
+        console.log("Error - Request to splatoon.ink API returned status " + xhReq.status);
+        this.state.request = xhReq;
+    }
+    
+    var iResp = JSON.parse(xhReq.responseText);
+    //console.log(iResponse);
+    //console.log("response: " + iResponse);
+    
+    var iNum = 0;
+    for (iNum = 0; iNum < iResp.schedule.length; iNum++) {
+        if (iResp.schedule[iNum].regular.hasOwnProperty("rulesEN")) {
+        }
+        else {
+            iResp.schedule[iNum].regular.rulesEN = "Turf War";
+        }
+    }
+    return iResp;
+};
 
-inkData.prototype.processInkResponse = function(iResp) {
+Monitor.prototype.processInkResponse = function(iResp) {
     var prepData = function(data) {
         var newData = [];
-        var stdData =  true;
         var mapBase = {
             startTime: null,
             endTime: null,
@@ -127,12 +149,14 @@ inkData.prototype.processInkResponse = function(iResp) {
         else {
             console.log("Prepping nonstandard rotation data. " +
                         "Schedule length is " + data.schedule.length);
-            stdData = false;
+            this.state.rotation = "nonstandard";
         }
         
         for (var iMap = 0; iMap < data.schedule.length; iMap++) {
-            mapBase.startTime = data.schedule[iMap].startTime;
-            mapBase.endTime = data.schedule[iMap].endTime;
+            console.log("start: " + data.schedule[iMap].startTime +
+                        "  end: " + data.schedule[iMap].endTime);
+            mapBase.startTime = new Date(data.schedule[iMap].startTime);
+            mapBase.endTime = new Date(data.schedule[iMap].endTime);
             mapBase.regular.maps[0] = data.schedule[iMap].regular.maps[0].nameEN;
             mapBase.regular.maps[1] = data.schedule[iMap].regular.maps[1].nameEN;
             mapBase.regular.rules = data.schedule[iMap].regular.rulesEN;
@@ -199,19 +223,33 @@ inkData.prototype.processInkResponse = function(iResp) {
     }
 };
 
-var splatime = new inkData();
-splatime.processInkResponse(inkResponse);
+Monitor.prototype.rotateMaps = function() {
+    return this.processInkResponse(this.getMaps());
+};
+
+var splatMonitor = new Monitor();
+splatMonitor.rotateMaps();
 
 //var monitor = new UI.Window({
 //    fullscreen: true,
 //});
-var monitor = new UI.Card({
+var splatTime = new UI.Card({
     title: 'Splatime!',
-    subtitle: 'TW maps:',
-    body: splatime.currMaps.regular.maps[0] + ", " + splatime.currMaps.regular.maps[1],
+    subtitle: 'Next rotation: ' +
+      splatMonitor.currMaps.formatTime(splatMonitor.currMaps.endTime),
+    body: splatMonitor.currMaps.regular.rules + ":\n" +
+      splatMonitor.currMaps.regular.maps[0] + ",\n" +
+      splatMonitor.currMaps.regular.maps[1] + "\n\n" +
+      splatMonitor.currMaps.ranked.rules + ":\n" +
+      splatMonitor.currMaps.ranked.maps[0] + ",\n" +
+      splatMonitor.currMaps.ranked.maps[1],
+    scrollable: true,
+    style: "small",
 });
+console.log(splatMonitor.currMaps.endTime.toTimeString());
+console.log(splatMonitor.currMaps.endTime.toUTCString());
 
-monitor.show();
+splatTime.show();
 
 //var now = new Date();
 //var timezone = now.getTimezoneOffset();
