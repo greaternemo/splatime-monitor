@@ -6,18 +6,124 @@
 
 var Settings = require('settings');
 var UI = require('ui');
-var Vector2 = require('vector2');
-var Clock = require('clock');
+//var Vector2 = require('vector2');
+//var Clock = require('clock');
 
 var regularRotation = false;
-var RR = function() {
-    return regularRotation;
-};
+//var RR = function() {
+//    return regularRotation;
+//};
 
-// This is a bit of future-proofing. If Ninty adds alternate modes to Random
-// matches in the future, they will presumably be formatted the same way as
-// the Ranked rules data is now. This will catch the alternate rules data if
-// it exists.
+if (Settings.option("reloaded") === true) {
+    //wooo
+    console.log("Options reloaded successfully from localStorage");
+}
+else {
+    console.log("Initializing new Settings.options");
+    // set default options if there's nothing in localStorage
+    Settings.option({
+        pins: false,
+        vibe: false,
+        mode: "regular",
+        favoritism: {
+            enabled: false,
+            modes: {
+                tw: "neutral",
+                sz: "neutral",
+                tc: "neutral",
+                rm: "neutral",
+            },
+            maps: {
+                mall: {
+                    tw: "neutral",
+                    sz: "neutral",
+                    tc: "neutral",
+                    rm: "neutral",
+                },
+                skatepark: {
+                    tw: "neutral",
+                    sz: "neutral",
+                    tc: "neutral",
+                    rm: "neutral",
+                },
+                rig: {
+                    tw: "neutral",
+                    sz: "neutral",
+                    tc: "neutral",
+                    rm: "neutral",
+                },
+                underpass: {
+                    tw: "neutral",
+                    sz: "neutral",
+                    tc: "neutral",
+                    rm: "neutral",
+                },
+                warehouse: {
+                    tw: "neutral",
+                    sz: "neutral",
+                    tc: "neutral",
+                    rm: "neutral",
+                },
+                port: {
+                    tw: "neutral",
+                    sz: "neutral",
+                    tc: "neutral",
+                    rm: "neutral",
+                },
+                dome: {
+                    tw: "neutral",
+                    sz: "neutral",
+                    tc: "neutral",
+                    rm: "neutral",
+                },
+                depot: {
+                    tw: "neutral",
+                    sz: "neutral",
+                    tc: "neutral",
+                    rm: "neutral",
+                },
+                towers: {
+                    tw: "neutral",
+                    sz: "neutral",
+                    tc: "neutral",
+                    rm: "neutral",
+                },
+                camp: {
+                    tw: "neutral",
+                    sz: "neutral",
+                    tc: "neutral",
+                    rm: "neutral",
+                },
+                heights: {
+                    tw: "neutral",
+                    sz: "neutral",
+                    tc: "neutral",
+                    rm: "neutral",
+                },
+                bridge: {
+                    tw: "neutral",
+                    sz: "neutral",
+                    tc: "neutral",
+                    rm: "neutral",
+                },
+            },
+        },
+        woomy: false,
+        ngyes: false,
+    });
+}
+
+Settings.config(
+    { url: 'http://mivida.juegos/apps/splatime-monitor/index.html' },
+    function(opts) {
+        console.log('Opening config page');
+        console.log('opts: ' + opts);
+    },
+    function(opts) {
+        console.log('Closed config page');
+        console.log('opts: ' + opts);
+    }
+);
 
 var scheduledMaps = function() {
     this.startTime = null;
@@ -48,8 +154,6 @@ scheduledMaps.prototype.formatTime = function(time) {
     }
     return timeString;
 };
-
-scheduledMaps.prototype.update = function() {};
 
 // These are for dumping one schedule's data into another.
 // Usage:
@@ -119,6 +223,7 @@ Monitor.prototype.getMaps = function() {
     var iNum = 0;
     for (iNum = 0; iNum < iResp.schedule.length; iNum++) {
         if (iResp.schedule[iNum].regular.hasOwnProperty("rulesEN")) {
+            regularRotation = true;
         }
         else {
             iResp.schedule[iNum].regular.rulesEN = "Turf War";
@@ -241,9 +346,13 @@ Monitor.prototype.rotateMaps = function() {
 var splatMonitor = new Monitor();
 splatMonitor.rotateMaps();
 
-//var monitor = new UI.Window({
-//    fullscreen: true,
-//});
+var curr = function() {
+    return splatMonitor.currMaps;
+};
+var currReg = function() {
+    return splatMonitor.currMaps.regular;
+};
+
 var splatTime = new UI.Card({
     title: 'Splatime!',
     subtitle: 'Next rotation: ' +
@@ -257,12 +366,6 @@ var splatTime = new UI.Card({
     scrollable: true,
     style: "small",
 });
-console.log(splatMonitor.currMaps.endTime.toTimeString());
-console.log(splatMonitor.currMaps.endTime.toUTCString());
-console.log(splatMonitor.nextMaps.endTime.toTimeString());
-console.log(splatMonitor.nextMaps.endTime.toUTCString());
-console.log(splatMonitor.lastMaps.endTime.toTimeString());
-console.log(splatMonitor.lastMaps.endTime.toUTCString());
 
 splatTime.show();
 
@@ -272,15 +375,6 @@ splatTime.show();
 
 
 /**
-var main = new UI.Card({
-  title: 'Pebble.js',
-  icon: 'images/menu_icon.png',
-  subtitle: 'Hello World!',
-  body: 'Press any button.'
-});
-
-main.show();
-
 var nextTime = Clock.weekday('tuesday', 6, 0);
 console.log('Seconds until then: ' + (nextTime - Date.now()));
 
