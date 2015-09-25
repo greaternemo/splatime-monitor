@@ -23,11 +23,11 @@ var scheduledMaps = function() {
     this.startTime = null;
     this.endTime = null;
     this.regular = {
-        maps: [],
+        maps: ["", "", ""],
         rules: "",
     };
     this.ranked = {
-        maps: [],
+        maps: ["", "", ""],
         rules: "",
     };
 };
@@ -130,18 +130,6 @@ Monitor.prototype.getMaps = function() {
 Monitor.prototype.processInkResponse = function(iResp) {
     var prepData = function(data) {
         var newData = [];
-        var mapBase = {
-            startTime: null,
-            endTime: null,
-            regular: {
-                maps: ["", ""],
-                rules: "",
-            },
-            ranked: {
-                maps: ["", ""],
-                rules: "",
-            },
-        };
         
         if (data.schedule.length == 3) {
             console.log("Prepping standard rotation data.");
@@ -152,18 +140,41 @@ Monitor.prototype.processInkResponse = function(iResp) {
             this.state.rotation = "nonstandard";
         }
         
+        var pullEN = function(info, opt) {
+            var temp = [];
+            var ident = opt + "EN";
+            console.log("info: " + info);
+            console.log(opt);
+            if (info.hasOwnProperty("length")) {
+                for (var i = 0; i < info.length; i++) {
+                    temp.push(info[i][ident]);
+                }
+            }
+            else {
+                temp = info[ident];
+            }
+            return temp;
+        };
+        
         for (var iMap = 0; iMap < data.schedule.length; iMap++) {
             console.log("start: " + data.schedule[iMap].startTime +
                         "  end: " + data.schedule[iMap].endTime);
-            mapBase.startTime = new Date(data.schedule[iMap].startTime);
-            mapBase.endTime = new Date(data.schedule[iMap].endTime);
-            mapBase.regular.maps[0] = data.schedule[iMap].regular.maps[0].nameEN;
-            mapBase.regular.maps[1] = data.schedule[iMap].regular.maps[1].nameEN;
-            mapBase.regular.rules = data.schedule[iMap].regular.rulesEN;
-            mapBase.ranked.maps[0] = data.schedule[iMap].ranked.maps[0].nameEN;
-            mapBase.ranked.maps[1] = data.schedule[iMap].ranked.maps[1].nameEN;
-            mapBase.ranked.rules = data.schedule[iMap].ranked.rulesEN;
-            newData.push(mapBase);
+            newData.push(new scheduledMaps());
+            console.log("" + data.schedule[iMap].regular.maps.length);
+            newData[iMap].consume({
+                startTime: new Date(data.schedule[iMap].startTime),
+                endTime: new Date(data.schedule[iMap].endTime),
+                regular: {
+                    maps: pullEN(data.schedule[iMap].regular.maps, "name"),
+                    rules: pullEN(data.schedule[iMap].regular, "rules"),
+                },
+                ranked: {
+                    maps: pullEN(data.schedule[iMap].ranked.maps, "name"),
+                    rules: pullEN(data.schedule[iMap].ranked, "rules"),
+                }
+
+            });
+            console.log('iMap: ' + iMap);
         }
         
         return newData;
@@ -248,6 +259,10 @@ var splatTime = new UI.Card({
 });
 console.log(splatMonitor.currMaps.endTime.toTimeString());
 console.log(splatMonitor.currMaps.endTime.toUTCString());
+console.log(splatMonitor.nextMaps.endTime.toTimeString());
+console.log(splatMonitor.nextMaps.endTime.toUTCString());
+console.log(splatMonitor.lastMaps.endTime.toTimeString());
+console.log(splatMonitor.lastMaps.endTime.toUTCString());
 
 splatTime.show();
 
