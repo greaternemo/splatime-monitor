@@ -19,6 +19,14 @@ var RULES_SIZE = new Vector2(144, 34);
 var MAPS_POSITION = new Vector2(0, 104);
 var MAPS_SIZE = new Vector2(144, 44);
 
+var platform = Pebble.getActiveWatchInfo().platform;
+if (platform == "basalt") {
+    console.log("Detected basalt platform: " + Pebble.getActiveWatchInfo().platform);
+}
+else {
+    console.log("Detected aplite platform: " + Pebble.getActiveWatchInfo().platform);
+}
+
 var scheduledMaps = function() {
     this.startTime = null;
     this.endTime = null;
@@ -37,6 +45,7 @@ scheduledMaps.prototype.formatTime = function(time) {
     var timeString = null;
     var start = "";
     var end = "";
+    var platformColor = null;
     
     function formatter(aTime) {
         var temp = "";
@@ -52,13 +61,20 @@ scheduledMaps.prototype.formatTime = function(time) {
         return temp;
     }
     
+    if (platform == 'basalt'){
+        platformColor = 'darkGray';
+    }
+    else {
+        platformColor = 'black';
+    }
+    
     start = formatter(this.startTime.getHours());
     end = formatter(this.endTime.getHours());
     timeString = new UI.Text({
         text: time + " Rotation:\n" + start + " - " + end,
         font: "gothic-24-bold",
         color: "white",
-        backgroundColor: "darkGray",
+        backgroundColor: platformColor,
         borderColor: "black",
         textAlign: "center",
         position: TIME_POSITION,
@@ -315,11 +331,22 @@ var splash = new UI.Window({
     scrollable: false,
     backgroundColor: 'black',
 });
+
+var comp = null;
+if (platform == "basalt") {
+    comp = 'normal';
+}
+else {
+    comp = 'or';
+}
+
 var squidmark = new UI.Image({
     position: new Vector2(0, 12),
     size: new Vector2(144, 144),
     image: 'images/squidmark_logo_144x144.png',
+    compositing: comp,
 });
+
 splash.add(squidmark);
 splash.show();
 
@@ -364,6 +391,13 @@ splatTime.window.on('click', 'down', function(e){
         console.log("Down button was clicked, already at viewIndex 5!");
     }
 });
+
+/**
+splatTime.window.on('click', 'select', function(e){
+    splash.show();
+    setTimeout(function() {splatTime.window.show(); splash.hide();}, 10000);
+});
+*/
 
 splatTime.window.on('accelTap', function(e) {
     console.log("Tapped the screen, forcing refresh");
