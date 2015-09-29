@@ -19,6 +19,14 @@ var RULES_SIZE = new Vector2(144, 34);
 var MAPS_POSITION = new Vector2(0, 104);
 var MAPS_SIZE = new Vector2(144, 44);
 
+var platform = Pebble.getActiveWatchInfo().platform;
+if (platform == "basalt") {
+    console.log("Detected basalt platform: " + Pebble.getActiveWatchInfo().platform);
+}
+else {
+    console.log("Detected aplite platform: " + Pebble.getActiveWatchInfo().platform);
+}
+
 var scheduledMaps = function() {
     this.startTime = null;
     this.endTime = null;
@@ -37,6 +45,7 @@ scheduledMaps.prototype.formatTime = function(time) {
     var timeString = null;
     var start = "";
     var end = "";
+    var platformColor = null;
     
     function formatter(aTime) {
         var temp = "";
@@ -52,13 +61,20 @@ scheduledMaps.prototype.formatTime = function(time) {
         return temp;
     }
     
+    if (platform == 'basalt'){
+        platformColor = 'darkGray';
+    }
+    else {
+        platformColor = 'black';
+    }
+    
     start = formatter(this.startTime.getHours());
     end = formatter(this.endTime.getHours());
     timeString = new UI.Text({
         text: time + " Rotation:\n" + start + " - " + end,
         font: "gothic-24-bold",
         color: "white",
-        backgroundColor: "darkGray",
+        backgroundColor: platformColor,
         borderColor: "black",
         textAlign: "center",
         position: TIME_POSITION,
@@ -310,6 +326,30 @@ var lRank = last().formatData("ranked");
 lRank.time = last().formatTime('Last');
 splatTime.views.push(lRank);
 
+var splash = new UI.Window({
+    fullscreen: true,
+    scrollable: false,
+    backgroundColor: 'black',
+});
+
+var comp = null;
+if (platform == "basalt") {
+    comp = 'normal';
+}
+else {
+    comp = 'or';
+}
+
+var squidmark = new UI.Image({
+    position: new Vector2(0, 12),
+    size: new Vector2(144, 144),
+    image: 'images/squidmark_logo_144x144.png',
+    compositing: comp,
+});
+
+splash.add(squidmark);
+splash.show();
+
 splatTime.window.on('click', 'up', function(e){
     if (splatTime.viewIndex > 0) {
         var thisIndex = null;
@@ -352,9 +392,17 @@ splatTime.window.on('click', 'down', function(e){
     }
 });
 
+/**
+splatTime.window.on('click', 'select', function(e){
+    splash.show();
+    setTimeout(function() {splatTime.window.show(); splash.hide();}, 10000);
+});
+*/
+
 splatTime.window.on('accelTap', function(e) {
     console.log("Tapped the screen, forcing refresh");
     Vibe.vibrate('long');
+    splash.show();
     splatTime.window.remove(splatTime.views[splatTime.viewIndex].time);
     splatTime.window.remove(splatTime.views[splatTime.viewIndex].rules);
     splatTime.window.remove(splatTime.views[splatTime.viewIndex].maps);
@@ -362,10 +410,11 @@ splatTime.window.on('accelTap', function(e) {
     splatTime.window.add(splatTime.views[splatTime.viewIndex].time);
     splatTime.window.add(splatTime.views[splatTime.viewIndex].rules);
     splatTime.window.add(splatTime.views[splatTime.viewIndex].maps);
+    setTimeout(function() {splatTime.window.show(); splash.hide();}, 1000);
 });
 
 // colorize things for the initial open
 splatTime.window.add(splatTime.views[0].time);
 splatTime.window.add(splatTime.views[0].rules);
 splatTime.window.add(splatTime.views[0].maps);
-splatTime.window.show();
+setTimeout(function() {splatTime.window.show(); splash.hide();}, 1000);

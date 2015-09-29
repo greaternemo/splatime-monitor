@@ -3,14 +3,13 @@
     "capabilities": [
         "location"
     ],
-    "companyName": "avboyd@gmail.com",
+    "companyName": "greater_nemo",
     "longName": "Splatime Monitor",
     "projectType": "pebblejs",
     "resources": {
         "media": [
             {
                 "file": "images/menu_icon.png",
-                "menuIcon": true,
                 "name": "IMAGE_MENU_ICON",
                 "type": "png"
             },
@@ -28,6 +27,17 @@
                 "file": "fonts/UbuntuMono-Regular.ttf",
                 "name": "MONO_FONT_14",
                 "type": "font"
+            },
+            {
+                "file": "images/squidmark_logo_144x144.png",
+                "name": "IMAGES_SQUIDMARK_LOGO_144X144_PNG",
+                "type": "png"
+            },
+            {
+                "file": "images/squidmark_logo.png",
+                "menuIcon": true,
+                "name": "IMAGES_SQUIDMARK_LOGO_PNG",
+                "type": "png"
             }
         ]
     },
