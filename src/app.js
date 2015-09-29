@@ -1,133 +1,28 @@
 /**
- * Hurk
- *
- * hurk!
+ * Splatime Monitor
+ * by greater_nemo (Adam Boyd)
+ * avboyd@gmail.com
  */
 
-var Settings = require('settings');
 var UI = require('ui');
-//var Vector2 = require('vector2');
-//var Clock = require('clock');
+var Vector2 = require('vector2');
+var Vibe = require('ui/vibe');
 
 var regularRotation = false;
-//var RR = function() {
-//    return regularRotation;
-//};
 
-if (Settings.option("reloaded") === true) {
-    //wooo
-    console.log("Options reloaded successfully from localStorage");
-}
-else {
-    console.log("Initializing new Settings.options");
-    // set default options if there's nothing in localStorage
-    Settings.option({
-        pins: false,
-        vibe: false,
-        mode: "regular",
-        favoritism: {
-            enabled: false,
-            modes: {
-                tw: "neutral",
-                sz: "neutral",
-                tc: "neutral",
-                rm: "neutral",
-            },
-            maps: {
-                mall: {
-                    tw: "neutral",
-                    sz: "neutral",
-                    tc: "neutral",
-                    rm: "neutral",
-                },
-                skatepark: {
-                    tw: "neutral",
-                    sz: "neutral",
-                    tc: "neutral",
-                    rm: "neutral",
-                },
-                rig: {
-                    tw: "neutral",
-                    sz: "neutral",
-                    tc: "neutral",
-                    rm: "neutral",
-                },
-                underpass: {
-                    tw: "neutral",
-                    sz: "neutral",
-                    tc: "neutral",
-                    rm: "neutral",
-                },
-                warehouse: {
-                    tw: "neutral",
-                    sz: "neutral",
-                    tc: "neutral",
-                    rm: "neutral",
-                },
-                port: {
-                    tw: "neutral",
-                    sz: "neutral",
-                    tc: "neutral",
-                    rm: "neutral",
-                },
-                dome: {
-                    tw: "neutral",
-                    sz: "neutral",
-                    tc: "neutral",
-                    rm: "neutral",
-                },
-                depot: {
-                    tw: "neutral",
-                    sz: "neutral",
-                    tc: "neutral",
-                    rm: "neutral",
-                },
-                towers: {
-                    tw: "neutral",
-                    sz: "neutral",
-                    tc: "neutral",
-                    rm: "neutral",
-                },
-                camp: {
-                    tw: "neutral",
-                    sz: "neutral",
-                    tc: "neutral",
-                    rm: "neutral",
-                },
-                heights: {
-                    tw: "neutral",
-                    sz: "neutral",
-                    tc: "neutral",
-                    rm: "neutral",
-                },
-                bridge: {
-                    tw: "neutral",
-                    sz: "neutral",
-                    tc: "neutral",
-                    rm: "neutral",
-                },
-            },
-        },
-        woomy: false,
-        ngyes: false,
-    });
-}
+var TIME_POSITION = new Vector2(0, 4);
+var TIME_SIZE = new Vector2(144, 58);
 
-Settings.config(
-    { url: 'http://mivida.juegos/apps/splatime-monitor/index.html' },
-    function(opts) {
-        console.log('Opening config page');
-        console.log('opts: ' + opts);
-    },
-    function(opts) {
-        console.log('Closed config page');
-        console.log('opts: ' + opts);
-    }
-);
+var RULES_POSITION = new Vector2(0, 66);
+var RULES_SIZE = new Vector2(144, 34);
+
+var MAPS_POSITION = new Vector2(0, 104);
+var MAPS_SIZE = new Vector2(144, 44);
 
 var scheduledMaps = function() {
     this.startTime = null;
     this.endTime = null;
+    this.times = null;
     this.regular = {
         maps: ["", "", ""],
         rules: "",
@@ -139,20 +34,75 @@ var scheduledMaps = function() {
 };
 
 scheduledMaps.prototype.formatTime = function(time) {
-    var timeString = "";
-    console.log(time.toLocaleTimeString());
-    console.log(time.getHours());
+    var timeString = null;
+    var start = "";
+    var end = "";
     
-    if (time.getHours() > 12) {
-        timeString = time.getHours()-12 + " PM";
+    function formatter(aTime) {
+        var temp = "";
+        if (aTime > 12) {
+            temp = aTime-12 + " PM";
+        }
+        else if (aTime === 0) {
+            temp = "12 AM";
+        }
+        else {
+            temp = aTime + " AM";
+        }
+        return temp;
     }
-    else if (time.getHours() === 0) {
-        timeString = "12 AM";
-    }
-    else {
-        timeString = time.getHours() + " AM";
-    }
+    
+    start = formatter(this.startTime.getHours());
+    end = formatter(this.endTime.getHours());
+    timeString = new UI.Text({
+        text: time + " Rotation:\n" + start + " - " + end,
+        font: "gothic-24-bold",
+        color: "white",
+        backgroundColor: "darkGray",
+        borderColor: "black",
+        textAlign: "center",
+        position: TIME_POSITION,
+        size: TIME_SIZE,
+    });
+    
     return timeString;
+};
+
+scheduledMaps.prototype.formatData = function(type) {
+    var texts = {
+        rules: null,
+        maps: null,
+    };
+    
+    var color = "";
+    if (type == "regular") {
+        color = "green";
+    }
+    else if (type == "ranked") {
+        color = "orange";
+    }
+    
+    texts.rules = new UI.Text({
+        text: this[type].rules + ":",
+        font: "gothic-24-bold",
+        color: "black",
+        backgroundColor: color,
+        borderColor: "black",
+        textAlign: "center",
+        position: RULES_POSITION,
+        size: RULES_SIZE,
+    });
+    texts.maps = new UI.Text({
+        text: this[type].maps[0] + "\n" + this[type].maps[1],
+        font: "gothic-18-bold",
+        color: "black",
+        backgroundColor: color,
+        borderColor: "black",
+        textAlign: "center",
+        position: MAPS_POSITION,
+        size: MAPS_SIZE,
+    });
+    return texts;
 };
 
 // These are for dumping one schedule's data into another.
@@ -175,10 +125,6 @@ scheduledMaps.prototype.consume = function(mapsData) {
     }
 };
 
-//scheduledMaps.prototype.start = function() {};
-//scheduledMaps.prototype.end = function() {};
-
-
 var Monitor = function() {
     this.state = {
         request: null,
@@ -188,13 +134,11 @@ var Monitor = function() {
     };
         
     this.mapState = {
-        prevMaps: "new",
         currMaps: "new",
         nextMaps: "new",
         lastMaps: "new",
     };
     
-    this.prevMaps = new scheduledMaps();
     this.currMaps = new scheduledMaps();
     this.nextMaps = new scheduledMaps();
     this.lastMaps = new scheduledMaps();
@@ -217,8 +161,6 @@ Monitor.prototype.getMaps = function() {
     }
     
     var iResp = JSON.parse(xhReq.responseText);
-    //console.log(iResponse);
-    //console.log("response: " + iResponse);
     
     var iNum = 0;
     for (iNum = 0; iNum < iResp.schedule.length; iNum++) {
@@ -248,8 +190,6 @@ Monitor.prototype.processInkResponse = function(iResp) {
         var pullEN = function(info, opt) {
             var temp = [];
             var ident = opt + "EN";
-            console.log("info: " + info);
-            console.log(opt);
             if (info.hasOwnProperty("length")) {
                 for (var i = 0; i < info.length; i++) {
                     temp.push(info[i][ident]);
@@ -262,10 +202,7 @@ Monitor.prototype.processInkResponse = function(iResp) {
         };
         
         for (var iMap = 0; iMap < data.schedule.length; iMap++) {
-            console.log("start: " + data.schedule[iMap].startTime +
-                        "  end: " + data.schedule[iMap].endTime);
             newData.push(new scheduledMaps());
-            console.log("" + data.schedule[iMap].regular.maps.length);
             newData[iMap].consume({
                 startTime: new Date(data.schedule[iMap].startTime),
                 endTime: new Date(data.schedule[iMap].endTime),
@@ -279,26 +216,13 @@ Monitor.prototype.processInkResponse = function(iResp) {
                 }
 
             });
-            console.log('iMap: ' + iMap);
-        }
-        
+        }      
         return newData;
     };
     
     var newData = prepData(iResp);
     for (var myMap in this.mapState) {
         switch (myMap) {
-            case "prevMaps":
-                if (this.mapState[myMap] == "new") {
-                    this.mapState[myMap] = "empty";
-                    console.log("prevMaps marked as empty");
-                }
-                else if (this.mapState[myMap] == "rotate") {
-                    this[myMap].consume(this.currMaps.feed());
-                    console.log("Rotating currMaps into prevMaps.");
-                    this.mapState[myMap] = "waiting";
-                }
-                break;
             case "currMaps":
                 if (this.mapState[myMap] == "new") {
                     this[myMap].consume(newData[0]);
@@ -346,78 +270,102 @@ Monitor.prototype.rotateMaps = function() {
 var splatMonitor = new Monitor();
 splatMonitor.rotateMaps();
 
-var curr = function() {
-    return splatMonitor.currMaps;
+var splatUI = function() {
+    this.viewIndex = 0;
+    this.window = new UI.Window({
+        clear: true,
+        scrollable: false,
+        backgroundColor: 'black',
+    });
+    this.views = [];
 };
-var currReg = function() {
-    return splatMonitor.currMaps.regular;
-};
 
-var splatTime = new UI.Card({
-    title: 'Splatime!',
-    subtitle: 'Next rotation: ' +
-      splatMonitor.currMaps.formatTime(splatMonitor.currMaps.endTime),
-    body: splatMonitor.currMaps.regular.rules + ":\n" +
-      splatMonitor.currMaps.regular.maps[0] + ",\n" +
-      splatMonitor.currMaps.regular.maps[1] + "\n\n" +
-      splatMonitor.currMaps.ranked.rules + ":\n" +
-      splatMonitor.currMaps.ranked.maps[0] + ",\n" +
-      splatMonitor.currMaps.ranked.maps[1],
-    scrollable: true,
-    style: "small",
+var splatTime = new splatUI();
+
+var curr = function() {return splatMonitor.currMaps;};
+var next = function() {return splatMonitor.nextMaps;};
+var last = function() {return splatMonitor.lastMaps;};
+
+// Current
+var cReg = curr().formatData("regular");
+cReg.time = curr().formatTime('Current');
+splatTime.views.push(cReg);
+var cRank = curr().formatData("ranked");
+cRank.time = curr().formatTime('Current');
+splatTime.views.push(cRank);
+
+// Next
+var nReg = next().formatData("regular");
+nReg.time = next().formatTime('Next');
+splatTime.views.push(nReg);
+var nRank = next().formatData("ranked");
+nRank.time = next().formatTime('Next');
+splatTime.views.push(nRank);
+
+// Later
+var lReg = last().formatData("regular");
+lReg.time = last().formatTime('Last');
+splatTime.views.push(lReg);
+var lRank = last().formatData("ranked");
+lRank.time = last().formatTime('Last');
+splatTime.views.push(lRank);
+
+splatTime.window.on('click', 'up', function(e){
+    if (splatTime.viewIndex > 0) {
+        var thisIndex = null;
+        thisIndex += splatTime.viewIndex;
+        // hide whatever is visible
+        console.log("Hiding view elements at index " + thisIndex);
+        splatTime.window.remove(splatTime.views[thisIndex].time);
+        splatTime.window.remove(splatTime.views[thisIndex].rules);
+        splatTime.window.remove(splatTime.views[thisIndex].maps);
+        // show me what I want to see
+        splatTime.viewIndex--;
+        console.log("Showing view elements at index " + splatTime.viewIndex);
+        splatTime.window.add(splatTime.views[splatTime.viewIndex].time);
+        splatTime.window.add(splatTime.views[splatTime.viewIndex].rules);
+        splatTime.window.add(splatTime.views[splatTime.viewIndex].maps);
+    }
+    else {
+        console.log("Up button was clicked, already at viewIndex 0!");
+    }
 });
 
-splatTime.show();
-
-//var now = new Date();
-//var timezone = now.getTimezoneOffset();
-//var time = now.getTime();
-
-
-/**
-var nextTime = Clock.weekday('tuesday', 6, 0);
-console.log('Seconds until then: ' + (nextTime - Date.now()));
-
-main.on('click', 'up', function(e) {
-  var menu = new UI.Menu({
-    sections: [{
-      items: [{
-        title: 'Pebble.js',
-        icon: 'images/menu_icon.png',
-        subtitle: 'Can do Menus'
-      }, {
-        title: 'Second Item',
-        subtitle: 'Subtitle Text'
-      }]
-    }]
-  });
-  menu.on('select', function(e) {
-    console.log('Selected item #' + e.itemIndex + ' of section #' + e.sectionIndex);
-    console.log('The item is titled "' + e.item.title + '"');
-  });
-  menu.show();
+splatTime.window.on('click', 'down', function(e){
+    if (splatTime.viewIndex < 5) {
+        var thisIndex = null;
+        thisIndex += splatTime.viewIndex;
+        // hide whatever is visible
+        console.log("Hiding view elements at index " + thisIndex);
+        splatTime.window.remove(splatTime.views[thisIndex].time);
+        splatTime.window.remove(splatTime.views[thisIndex].rules);
+        splatTime.window.remove(splatTime.views[thisIndex].maps);
+        // show me what I want to see
+        splatTime.viewIndex++;
+        console.log("Showing view elements at index " + splatTime.viewIndex);
+        splatTime.window.add(splatTime.views[splatTime.viewIndex].time);
+        splatTime.window.add(splatTime.views[splatTime.viewIndex].rules);
+        splatTime.window.add(splatTime.views[splatTime.viewIndex].maps);
+    }
+    else {
+        console.log("Down button was clicked, already at viewIndex 5!");
+    }
 });
 
-main.on('click', 'select', function(e) {
-  var wind = new UI.Window({
-    fullscreen: true,
-  });
-  var textfield = new UI.Text({
-    position: new Vector2(0, 65),
-    size: new Vector2(144, 30),
-    font: 'gothic-24-bold',
-    text: 'Text Anywhere!',
-    textAlign: 'center'
-  });
-  wind.add(textfield);
-  wind.show();
+splatTime.window.on('accelTap', function(e) {
+    console.log("Tapped the screen, forcing refresh");
+    Vibe.vibrate('long');
+    splatTime.window.remove(splatTime.views[splatTime.viewIndex].time);
+    splatTime.window.remove(splatTime.views[splatTime.viewIndex].rules);
+    splatTime.window.remove(splatTime.views[splatTime.viewIndex].maps);
+    splatMonitor.rotateMaps();
+    splatTime.window.add(splatTime.views[splatTime.viewIndex].time);
+    splatTime.window.add(splatTime.views[splatTime.viewIndex].rules);
+    splatTime.window.add(splatTime.views[splatTime.viewIndex].maps);
 });
 
-main.on('click', 'down', function(e) {
-  var card = new UI.Card();
-  card.title('A Card');
-  card.subtitle('Is a Window');
-  card.body('The simplest window type in Pebble.js.');
-  card.show();
-});
-*/
+// colorize things for the initial open
+splatTime.window.add(splatTime.views[0].time);
+splatTime.window.add(splatTime.views[0].rules);
+splatTime.window.add(splatTime.views[0].maps);
+splatTime.window.show();

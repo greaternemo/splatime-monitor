@@ -1,8 +1,7 @@
 {
     "appKeys": {},
     "capabilities": [
-        "location",
-        "configurable"
+        "location"
     ],
     "companyName": "avboyd@gmail.com",
     "longName": "Splatime Monitor",
@@ -36,7 +35,7 @@
     "shortName": "Splatime Monitor",
     "uuid": "0b4c1dc4-a1d3-446a-b239-378c43089c01",
     "versionCode": 1,
-    "versionLabel": "0.1",
+    "versionLabel": "1.0",
     "watchapp": {
         "hiddenApp": false,
         "watchface": false
