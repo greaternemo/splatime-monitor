@@ -310,6 +310,19 @@ var lRank = last().formatData("ranked");
 lRank.time = last().formatTime('Last');
 splatTime.views.push(lRank);
 
+var splash = new UI.Window({
+    fullscreen: true,
+    scrollable: false,
+    backgroundColor: 'black',
+});
+var squidmark = new UI.Image({
+    position: new Vector2(0, 12),
+    size: new Vector2(144, 144),
+    image: 'images/squidmark_logo_144x144.png',
+});
+splash.add(squidmark);
+splash.show();
+
 splatTime.window.on('click', 'up', function(e){
     if (splatTime.viewIndex > 0) {
         var thisIndex = null;
@@ -355,6 +368,7 @@ splatTime.window.on('click', 'down', function(e){
 splatTime.window.on('accelTap', function(e) {
     console.log("Tapped the screen, forcing refresh");
     Vibe.vibrate('long');
+    splash.show();
     splatTime.window.remove(splatTime.views[splatTime.viewIndex].time);
     splatTime.window.remove(splatTime.views[splatTime.viewIndex].rules);
     splatTime.window.remove(splatTime.views[splatTime.viewIndex].maps);
@@ -362,10 +376,11 @@ splatTime.window.on('accelTap', function(e) {
     splatTime.window.add(splatTime.views[splatTime.viewIndex].time);
     splatTime.window.add(splatTime.views[splatTime.viewIndex].rules);
     splatTime.window.add(splatTime.views[splatTime.viewIndex].maps);
+    setTimeout(function() {splatTime.window.show(); splash.hide();}, 1000);
 });
 
 // colorize things for the initial open
 splatTime.window.add(splatTime.views[0].time);
 splatTime.window.add(splatTime.views[0].rules);
 splatTime.window.add(splatTime.views[0].maps);
-splatTime.window.show();
+setTimeout(function() {splatTime.window.show(); splash.hide();}, 1000);
