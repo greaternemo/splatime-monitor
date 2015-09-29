@@ -2,6 +2,7 @@
  * Splatime Monitor
  * by greater_nemo (Adam Boyd)
  * avboyd@gmail.com
+ *
  */
 
 var UI = require('ui');

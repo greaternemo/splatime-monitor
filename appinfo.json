@@ -45,7 +45,7 @@
     "shortName": "Splatime Monitor",
     "uuid": "0b4c1dc4-a1d3-446a-b239-378c43089c01",
     "versionCode": 1,
-    "versionLabel": "1.0",
+    "versionLabel": "1.1",
     "watchapp": {
         "hiddenApp": false,
         "watchface": false
