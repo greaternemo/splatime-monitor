@@ -20,12 +20,13 @@ var RULES_SIZE = new Vector2(144, 34);
 var MAPS_POSITION = new Vector2(0, 104);
 var MAPS_SIZE = new Vector2(144, 44);
 
-var platform = Pebble.getActiveWatchInfo().platform;
-if (platform == "basalt") {
-    console.log("Detected basalt platform: " + Pebble.getActiveWatchInfo().platform);
+var platform = null;
+if (Pebble.getActiveWatchInfo) {
+    console.log("Detected Basalt platform");
+    platform = "basalt";
 }
 else {
-    console.log("Detected aplite platform: " + Pebble.getActiveWatchInfo().platform);
+    console.log("Detected Aplite platform");
 }
 
 var scheduledMaps = function() {
