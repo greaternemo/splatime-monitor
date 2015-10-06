@@ -29,6 +29,16 @@
                 "type": "font"
             },
             {
+                "file": "images/squid_splatfest.png",
+                "name": "IMAGES_SQUID_SPLATFEST_PNG",
+                "type": "png"
+            },
+            {
+                "file": "images/squid_error.png",
+                "name": "IMAGES_SQUID_ERROR_PNG",
+                "type": "png"
+            },
+            {
                 "file": "images/squidmark_logo_144x144.png",
                 "name": "IMAGES_SQUIDMARK_LOGO_144X144_PNG",
                 "type": "png"
