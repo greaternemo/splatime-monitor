@@ -40,17 +40,17 @@ var SplatBase = {
     },
     
     squidmark: {
-        pos: new Vector2(0, 40),
+        pos: new Vector2(0, 12),
         size: new Vector2(144, 144),
         img: 'images/squidmark_logo_144x144.png',
     },
     
-    splashtxt: {
+    woomy: {
         color: 'white',
         font: 'bitham-30-black',
         align: 'center',
-        pos: Vector2(0, 70),
-        size: Vector2(144, 30),
+        pos: new Vector2(0, 70),
+        size: new Vector2(144, 30),
     },
     
     main: ["time", "rules", "maps"],

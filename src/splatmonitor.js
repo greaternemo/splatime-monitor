@@ -12,6 +12,8 @@ var SplatMonitor = function() {
         lastAttempt: null,
         rotation: "standard",
         doRegRulesRotate: false,
+        password: ["A", "B", "A", "B", "B", "B", "B", "B"],
+        presses: ["", "", "", "", "", "", "", ""],
     };
         
     this.mapState = {
@@ -64,7 +66,7 @@ SplatMonitor.prototype.processInkResponse = function(iResp) {
             console.log("Bailing out due to improper API response");
             return 'fail';
         }
-        else if (data.schedule.length == 3) {
+        else if (data.schedule.length == 3 && data.schedule[0].ranked.maps.length == 2) {
             console.log("Prepping standard rotation data.");
         }
         else {
@@ -173,6 +175,12 @@ SplatMonitor.prototype.rotateMaps = function() {
         }
     }
     return this.processInkResponse(this.getMaps());
+};
+
+SplatMonitor.prototype.handlePress = function(button) {
+    // Buttons should be logged "A" for up, "B", for down
+    this.state.presses.shift();
+    this.state.presses.push(button);
 };
 
 module.exports = SplatMonitor;

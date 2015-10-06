@@ -20,34 +20,58 @@ var SplatView = function() {
     this.elems = {
         squidmark: new UI.Image({
             position: sBase.squidmark.pos,
-            size: sBase.squidmark.base,
+            size: sBase.squidmark.size,
             image: sBase.squidmark.img,
             compositing: sBase.comp(),
         }),
         woomy: new UI.Text({
-            text: 'WOOMY',
-            color: sBase.splashtxt.color,
-            font: sBase.splashtxt.font,
-            textAlign: sBase.splashtxt.align,
-            position: sBase.splashtxt.pos,
-            size: sBase.splashtxt.size,
+            text: 'WOOMY!',
+            color: sBase.woomy.color,
+            font: sBase.woomy.font,
+            textAlign: sBase.woomy.align,
+            position: sBase.woomy.pos,
+            size: sBase.woomy.size,
         }),
         ngyes: new UI.Text({
-            text: 'NGYES',
-            color: sBase.splashtxt.color,
-            font: sBase.splashtxt.font,
-            textAlign: sBase.splashtxt.align,
-            position: sBase.splashtxt.pos,
-            size: sBase.splashtxt.size,
+            text: 'NGYES!',
+            color: sBase.woomy.color,
+            font: sBase.woomy.font,
+            textAlign: sBase.woomy.align,
+            position: sBase.woomy.pos,
+            size: sBase.woomy.size,
         }),
-        status: new UI.Text({
+        booty: new UI.Text({
+            text: 'BOOTY!',
+            color: sBase.woomy.color,
+            font: sBase.woomy.font,
+            textAlign: sBase.woomy.align,
+            position: sBase.woomy.pos,
+            size: sBase.woomy.size,
+        }),
+        fail: new UI.Text({
+            text: 'Unable to reach splatoon.ink API for maps!',
             color: sBase.status.color,
             font: sBase.status.font,
             textAlign: sBase.status.align,
             position: sBase.status.pos,
             size: sBase.status.size,
         }),
-        squid: new UI.Image({
+        splatfest: new UI.Text({
+            text: 'Today is a Splatfest! Go support your team!',
+            color: sBase.status.color,
+            font: sBase.status.font,
+            textAlign: sBase.status.align,
+            position: sBase.status.pos,
+            size: sBase.status.size,
+        }),
+        squidfail: new UI.Image({
+            image: 'images/squidfail.png',
+            position: sBase.squid.pos,
+            size: sBase.squid.size,
+            compositing: sBase.comp(),
+        }),
+        squidfest: new UI.Image({
+            image: 'images/squidfest.png',
             position: sBase.squid.pos,
             size: sBase.squid.size,
             compositing: sBase.comp(),
@@ -57,12 +81,12 @@ var SplatView = function() {
 };
 
 SplatView.prototype.showMain = function () {
-    console.log("Showing view elements at index " + this.viewIndex);
+    //console.log("Showing view elements at index " + this.viewIndex);
     this.alterMain('add');
 };
 
 SplatView.prototype.hideMain = function () {
-    console.log("Hiding view elements at index " + this.viewIndex);
+    //console.log("Hiding view elements at index " + this.viewIndex);
     this.alterMain('remove');
 };
 
@@ -73,20 +97,24 @@ SplatView.prototype.alterMain = function (act) {
 };
 
 SplatView.prototype.showFail = function () {
-    this.elems.status.text = 'Unable to reach splatoon.ink API for maps!';
-    this.elems.squid.image = 'images/squid_fail.png';
+    this.status.each( function(element) {
+        element.remove();
+    });
+    this.status.add(this.elems.fail);
+    this.status.add(this.elems.squidfail);
     this.showStatus();
 };
 
-SplatView.prototype.showSplatfest = function () {
-    this.elems.status.text = 'Today is a Splatfest! Go support your team!';
-    this.elems.squid.image = 'images/squid_splatfest.png';
+SplatView.prototype.showFest = function () {
+    this.status.each( function(element) {
+        element.remove();
+    });
+    this.status.add(this.elems.splatfest);
+    this.status.add(this.elems.squidfest);
     this.showStatus();
 };
 
 SplatView.prototype.showStatus = function () {
-    this.status.add(this.elems.status);
-    this.status.add(this.elems.squid);
     this.status.show();
     this.splash.hide();
 };
@@ -96,13 +124,21 @@ SplatView.prototype.woomy = function () {
         element.remove();
     });
 
-    var seed = 9;
-    //var seed = sBase.randInt(1, 15);
-    console.log("seed: " + seed);
-    if (seed == 7) {
+    var seed = sBase.randInt(1, 15);
+    var bonus = sBase.randInt(1, 15);
+    //console.log("seed: " + seed);
+    //console.log("bonus: " + bonus);
+    
+    if (seed == 4 && bonus == 2) {
+        console.log("seed == 4, bonus == 2, BOOTY!");
+        this.splash.add(this.elems.booty);
+    }
+    else if (seed == 7) {
+        console.log("seed == 7, WOOMY!");
         this.splash.add(this.elems.woomy);
     }
     else if (seed == 13) {
+        console.log("seed == 13, NGYES!");
         this.splash.add(this.elems.ngyes);
     }
     else {

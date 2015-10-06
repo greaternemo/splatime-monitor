@@ -29,13 +29,13 @@
                 "type": "font"
             },
             {
-                "file": "images/squid_splatfest.png",
-                "name": "IMAGES_SQUID_SPLATFEST_PNG",
+                "file": "images/squidfest.png",
+                "name": "IMAGES_SQUIDFEST_PNG",
                 "type": "png"
             },
             {
-                "file": "images/squid_error.png",
-                "name": "IMAGES_SQUID_ERROR_PNG",
+                "file": "images/squidfail.png",
+                "name": "IMAGES_SQUIDFAIL_PNG",
                 "type": "png"
             },
             {
