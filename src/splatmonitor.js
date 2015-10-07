@@ -33,48 +33,75 @@ SplatMonitor.prototype.getMaps = function() {
     var xhReq = new XMLHttpRequest();
     xhReq.open('GET', 'http://splatoon.ink/schedule.json', false);
     xhReq.send(null);
+
+    /**
+    Alternate declaration for testing failure/splatfest
+    
+    var xhReq = {
+        status: 403
+    };
+    
+    var xhReq = {
+        status: 200,
+        responseText: JSON.stringify({
+            schedule: ['NOPE', 'NOPE', 'NOPE'],
+        })
+    };
+    */
     
     if (xhReq.status == 200) {
-        console.log('Success - Request to splatoon.ink API returned status 200.');
+        console.log('Success - splatoon.ink API returned status 200.');
         this.state.request = xhReq.status;
     }
     else if (xhReq.status !== 200) {
-        console.log('Failure - Request to splatoon.ink API returned status ' + xhReq.status);
+        console.log('Failure - splatoon.ink API returned status ' + xhReq.status);
         this.state.request = xhReq;
         return 'fail';
     }
     
     var iResp = JSON.parse(xhReq.responseText);
     
-    var iNum = 0;
-    for (iNum = 0; iNum < iResp.schedule.length; iNum++) {
-        if (iResp.schedule[iNum].regular.hasOwnProperty("rulesEN")) {
-            this.doRegRulesRotate = true;
+    if (iResp.schedule[0].hasOwnProperty("ranked")) {
+        var iNum = 0;
+        for (iNum = 0; iNum < iResp.schedule.length; iNum++) {
+            if (iResp.schedule[iNum].regular.hasOwnProperty("rulesEN")) {
+                this.state.doRegRulesRotate = true;
+            }
+            else {
+                iResp.schedule[iNum].regular.rulesEN = "Turf War";
+            }
         }
-        else {
-            iResp.schedule[iNum].regular.rulesEN = "Turf War";
-        }
+        return iResp;
     }
-    return iResp;
+    else {
+        return 'splatfest';
+    }
 };
 
 SplatMonitor.prototype.processInkResponse = function(iResp) {
-    var prepData = function(data) {
+    var dataPrep = function(data) {
         var newData = [];
         
         if (data == 'fail') {
-            console.log("Bailing out due to improper API response");
+            console.log("Bailing out due to improper API response.");
             return 'fail';
         }
-        else if (data.schedule.length == 3 && data.schedule[0].ranked.maps.length == 2) {
+        else if (data == 'splatfest') {
+            // The splatoon.ink API breaks during Splatfests, so we're compensating.
+            console.log("Bailing out due to nonstandard JSON data.");
+            this.state.rotation = "splatfest";
+            return 'splatfest';
+        }
+        else if (data.schedule.length == 3) {
             console.log("Prepping standard rotation data.");
         }
-        else {
-            // The splatoon.ink API breaks during Splatfests, so we're compensating.
-            console.log("Prepping nonstandard rotation data. " +
-                        "Schedule length is " + data.schedule.length);
+        else if (data.schedule.length < 3) {
+            console.log("Prepping nonstandard rotation data.");
             this.state.rotation = "nonstandard";
-            return false;
+        }
+        else if (data.schedule.length > 3) {
+            console.log("schedule.length > 3, bailing out due to wtf.");
+            return 'fail';
         }
         
         var pullEN = function(info, opt) {
@@ -110,13 +137,15 @@ SplatMonitor.prototype.processInkResponse = function(iResp) {
         return newData;
     };
     
+    var prepData = dataPrep.bind(this);
+    
     var newData = prepData(iResp);
-    if (this.state.rotation == 'nonstandard') {
-        this.lastAttempt = 'splatfest';
+    if (newData == 'splatfest') {
+        this.state.lastAttempt = 'splatfest';
         return;
     }
     else if (newData == 'fail') {
-        this.lastAttempt = 'fail';
+        this.state.lastAttempt = 'fail';
         return;
     }
     
@@ -135,9 +164,14 @@ SplatMonitor.prototype.processInkResponse = function(iResp) {
                 break;
             case "nextMaps":
                 if (this.mapState[myMap] == "new") {
-                    this[myMap].consume(newData[1]);
-                    this[myMap].time = 'Next';
-                    console.log("Adding new nextMaps to rotation.");
+                    if (newData.length >= 2) {
+                        this[myMap].consume(newData[1]);
+                        this[myMap].time = 'Next';
+                        console.log("Adding new nextMaps to rotation.");
+                    }
+                    else {
+                        console.log("No nextMaps to load at index 1.");
+                    }
                 }
                 else if (this.mapState[myMap] == "rotate") {
                     this[myMap].consume(this.lastMaps.feed());
@@ -147,8 +181,13 @@ SplatMonitor.prototype.processInkResponse = function(iResp) {
             case "lastMaps":
                 this[myMap].consume(newData[2]);
                 if (this.mapState[myMap] == "new") {
-                    this[myMap].time = 'Later';
-                    console.log("Adding new lastMaps to rotation.");
+                    if (newData.length == 3) {
+                        this[myMap].time = 'Later';
+                        console.log("Adding new lastMaps to rotation.");
+                    }
+                    else {
+                        console.log("No lastMaps to load at index 2.");
+                    }
                 }
                 else if (this.mapState[myMap] == "rotate") {
                     console.log("Adding new lastMaps to rotation.");

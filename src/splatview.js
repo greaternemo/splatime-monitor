@@ -14,7 +14,7 @@ var SplatView = function() {
     this.splash = sBase.aWindow({
         fullscreen: true,
     });
-    this.status= sBase.aWindow({
+    this.status = sBase.aWindow({
         clear: true,
     });
     this.elems = {
@@ -125,7 +125,7 @@ SplatView.prototype.woomy = function () {
     });
 
     var seed = sBase.randInt(1, 15);
-    var bonus = sBase.randInt(1, 15);
+    var bonus = sBase.randInt(1, 5);
     //console.log("seed: " + seed);
     //console.log("bonus: " + bonus);
     
