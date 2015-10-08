@@ -90,8 +90,6 @@ SplatView.prototype.updateMain = function () {
     //console.log("Showing view elements at index " + this.viewIndex);
     for (var i = 0; i < sBase.main.length; i++) {
         for (var mapKey in this.views[this.viewIndex][sBase.main[i]]) {
-            console.log('this.elems.'+sBase.main[i]+'.'+mapKey+'(this.views['+this.viewIndex+'].'+sBase.main[i]+'.'+mapKey+')');
-            console.log(this.elems[sBase.main[i]][mapKey].toString());
             this.elems[sBase.main[i]][mapKey](this.views[this.viewIndex][sBase.main[i]][mapKey]);
         }
     }
@@ -115,8 +113,6 @@ SplatView.prototype.showStatus = function (state) {
 SplatView.prototype.woomy = function () {
     var seed = sBase.randInt(1, 15);
     var bonus = sBase.randInt(1, 5);
-    //console.log("seed: " + seed);
-    //console.log("bonus: " + bonus);
     
     if (seed == 4 && bonus == 2) {
         console.log("seed == 4, bonus == 2, BOOTY!");

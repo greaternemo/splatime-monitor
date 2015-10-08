@@ -152,67 +152,42 @@ SplatMonitor.prototype.processInkResponse = function(iResp) {
     for (var myMap in this.mapState) {
         switch (myMap) {
             case "currMaps":
-                if (this.mapState[myMap] == 'new') {
-                    this[myMap].consume(newData[0]);
-                    this[myMap].time = 'Current';
-                    console.log('Adding new currMaps to rotation.');
-                }
-                else if (this.mapState[myMap] == 'rotate') {
-                    this[myMap].consume(this.nextMaps.feed());
-                    console.log('Rotating nextMaps into currMaps.');
-                }
+                this.currMaps.time = 'Current';
+                // There should ALWAYS be a set of current maps if not fail or splatfest.
+                this.currMaps.consume(newData[0]);
+                console.log('Adding new currMaps to rotation.');
                 break;
             case "nextMaps":
-                if (this.mapState[myMap] == "new") {
-                    if (newData.length >= 2) {
-                        this[myMap].consume(newData[1]);
-                        this[myMap].time = 'Next';
-                        console.log("Adding new nextMaps to rotation.");
-                    }
-                    else {
-                        console.log("No nextMaps to load at index 1.");
-                    }
+                this.nextMaps.time = 'Next';
+                if (newData.length >= 2) {
+                    this.nextMaps.consume(newData[1]);
+                    this.mapState.nextMaps = 'ready';
+                    console.log("Adding new nextMaps to rotation.");
                 }
-                else if (this.mapState[myMap] == "rotate") {
-                    this[myMap].consume(this.lastMaps.feed());
-                    console.log("Rotating lastMaps into nextMaps.");
+                else {
+                    this.mapState.nextMaps = 'none';
+                    console.log("No nextMaps to load at index 1.");
                 }
                 break;
             case "lastMaps":
-                this[myMap].consume(newData[2]);
-                if (this.mapState[myMap] == "new") {
-                    if (newData.length == 3) {
-                        this[myMap].time = 'Later';
-                        console.log("Adding new lastMaps to rotation.");
-                    }
-                    else {
-                        console.log("No lastMaps to load at index 2.");
-                    }
-                }
-                else if (this.mapState[myMap] == "rotate") {
+                this.lastMaps.time = 'Later';
+                if (newData.length == 3) {
+                    this.lastMaps.consume(newData[2]);
+                    this.mapState.lastMaps = 'ready';
                     console.log("Adding new lastMaps to rotation.");
+                }
+                else {
+                    this.mapState.lastMaps = 'none';
+                    console.log("No lastMaps to load at index 2.");
                 }
                 break;
         }
-        this.mapState[myMap] = 'done';
     }
     this.lastAttempt = 'success';
     return;
 };
 
 SplatMonitor.prototype.rotateMaps = function() {
-    if (this.mapState.currMaps !== 'new') {
-        if (Date.now() < this.currMaps.endTime) {
-            console.log('Attempted to rotate, still too early.');
-            return 'early';
-        }
-        else {
-            console.log('Proceeding with rotation based on currMaps.endTime');
-            for (var i in this.mapState) {
-                this.mapState[i] = 'rotate';
-            }
-        }
-    }
     return this.processInkResponse(this.getMaps());
 };
 
@@ -220,6 +195,13 @@ SplatMonitor.prototype.handlePress = function(button) {
     // Buttons should be logged "A" for up, "B", for down
     this.state.presses.shift();
     this.state.presses.push(button);
+};
+
+SplatMonitor.prototype.clearMaps = function() {
+    // Sets all map value to null, trying to save some memory here.
+    for (var mapKey in this.mapState) {
+        this[mapKey] = null;
+    }
 };
 
 module.exports = SplatMonitor;

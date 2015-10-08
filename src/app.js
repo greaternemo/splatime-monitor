@@ -59,6 +59,9 @@ else {
     sView.views.push(lReg);
     var lRank = last().formatData("ranked");
     sView.views.push(lRank);
+    
+    // Once we've generated all the visual data, clear the old map data.
+    //sMonitor.clearMaps();
 
     sView.window.on('click', 'up', function(e){
         sMonitor.handlePress("A");
