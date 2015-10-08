@@ -68,10 +68,6 @@ else {
         if (sMonitor.state.presses.toString() == sMonitor.state.password.toString()) {
             console.log("Debug password entered! Loading debug menu!");
             var debugMenu = new UI.Menu({
-                backgroundColor: 'black',
-                textColor: 'white',
-                highlightBackgroundColor: 'white',
-                highlightTextColor: 'black',
                 sections: [{
                     title: 'Error Pages',
                     items: [{
