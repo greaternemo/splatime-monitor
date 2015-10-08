@@ -73,7 +73,7 @@ var SplatView = function() {
             size: sBase.squid.size,
         }),
     };
-    this.views = [];
+    this.views = [null, null, null, null, null, null];
     
     this.window.add(this.elems.time);
     this.window.add(this.elems.rules);

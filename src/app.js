@@ -38,30 +38,7 @@ else if (sMonitor.state.lastAttempt == 'splatfest') {
 // handle it.
 else {
     
-    var curr = function() {return sMonitor.currMaps;};
-    var next = function() {return sMonitor.nextMaps;};
-    var last = function() {return sMonitor.lastMaps;};
-
-    // Current
-    var cReg = curr().formatData("regular");
-    sView.views.push(cReg);
-    var cRank = curr().formatData("ranked");
-    sView.views.push(cRank);
-
-    // Next
-    var nReg = next().formatData("regular");
-    sView.views.push(nReg);
-    var nRank = next().formatData("ranked");
-    sView.views.push(nRank);
-
-    // Later
-    var lReg = last().formatData("regular");
-    sView.views.push(lReg);
-    var lRank = last().formatData("ranked");
-    sView.views.push(lRank);
-    
-    // Once we've generated all the visual data, clear the old map data.
-    //sMonitor.clearMaps();
+    sMonitor.formatAll(sView);
 
     sView.window.on('click', 'up', function(e){
         sMonitor.handlePress("A");
@@ -84,9 +61,9 @@ else {
             //console.log("Down button was clicked, already at viewIndex 5!");
         }
     });
-    
+
     // Debug menu for errors, requires secret password :3
-    
+
     sView.window.on('longClick', 'select', function(e) {
         if (sMonitor.state.presses.toString() == sMonitor.state.password.toString()) {
             console.log("Debug password entered! Loading debug menu!");
@@ -138,8 +115,19 @@ else {
         Vibe.vibrate('short');
         sView.woomy();
         sMonitor.rotateMaps();
-        sView.updateMain();
-        setTimeout(function() {sView.window.show(); sView.splash.hide();}, 1000);
+        // If the API request failed, show an error splash. That's it.
+        if (sMonitor.state.lastAttempt == 'fail') {
+            sView.showFail();
+        }
+        // If we didn't get back data that we understand, show a Splatfest splash.
+        else if (sMonitor.state.lastAttempt == 'splatfest') {
+            sView.showFest();
+        }
+        else {
+            sMonitor.formatAll(sView);
+            sView.updateMain();
+            setTimeout(function() {sView.window.show(); sView.splash.hide();}, 1000);
+        }
     });
 
     // colorize things for the initial open

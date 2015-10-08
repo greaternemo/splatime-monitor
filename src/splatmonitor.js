@@ -22,9 +22,9 @@ var SplatMonitor = function() {
         lastMaps: "new",
     };
     
-    this.currMaps = new sMap();
-    this.nextMaps = new sMap();
-    this.lastMaps = new sMap();
+    this.currMaps = null;
+    this.nextMaps = null;
+    this.lastMaps = null;
     
 };
 
@@ -149,16 +149,16 @@ SplatMonitor.prototype.processInkResponse = function(iResp) {
         return;
     }
     
+    this.initMaps();
+    
     for (var myMap in this.mapState) {
         switch (myMap) {
             case "currMaps":
-                this.currMaps.time = 'Current';
                 // There should ALWAYS be a set of current maps if not fail or splatfest.
                 this.currMaps.consume(newData[0]);
                 console.log('Adding new currMaps to rotation.');
                 break;
             case "nextMaps":
-                this.nextMaps.time = 'Next';
                 if (newData.length >= 2) {
                     this.nextMaps.consume(newData[1]);
                     this.mapState.nextMaps = 'ready';
@@ -170,7 +170,6 @@ SplatMonitor.prototype.processInkResponse = function(iResp) {
                 }
                 break;
             case "lastMaps":
-                this.lastMaps.time = 'Later';
                 if (newData.length == 3) {
                     this.lastMaps.consume(newData[2]);
                     this.mapState.lastMaps = 'ready';
@@ -202,6 +201,34 @@ SplatMonitor.prototype.clearMaps = function() {
     for (var mapKey in this.mapState) {
         this[mapKey] = null;
     }
+};
+
+SplatMonitor.prototype.initMaps = function() {
+    for (var mapKey in this.mapState) {
+        this[mapKey] = new sMap();
+    }
+};
+
+SplatMonitor.prototype.formatAll = function(splatView) {
+    // Current
+    var cReg = this.currMaps.formatData('regular', 'Current');
+    splatView.views[0] = cReg;
+    var cRank = this.currMaps.formatData('ranked', 'Current');
+    splatView.views[1] = cRank;
+
+    // Next
+    var nReg = this.nextMaps.formatData('regular', 'Next');
+    splatView.views[2] = nReg;
+    var nRank = this.nextMaps.formatData('ranked', 'Next');
+    splatView.views[3] = nRank;
+
+    // Later
+    var lReg = this.lastMaps.formatData('regular', 'Last');
+    splatView.views[4] = lReg;
+    var lRank = this.lastMaps.formatData('ranked', 'Last');
+    splatView.views[5] = lRank;
+    
+    this.clearMaps();
 };
 
 module.exports = SplatMonitor;

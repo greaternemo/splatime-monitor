@@ -51,23 +51,23 @@ SplatMap.prototype.formatTime = function(time) {
     return timeText;
 };
 
-SplatMap.prototype.formatData = function(type) {
+SplatMap.prototype.formatData = function(sType, sTime) {
     var texts = {
         type: null,
         time: null,
         rules: null,
         maps: null,
     };
-    var rulesbg = type + 'bg';
+    var rulesbg = sType + 'bg';
     
-    texts.type = type;
-    texts.time = this.formatTime(this.time);
+    texts.type = sType;
+    texts.time = this.formatTime(sTime);
     texts.rules = {
-        text: this[type].rules + ":",
+        text: this[sType].rules + ":",
         backgroundColor: sBase.plAttr(rulesbg),
     };
     texts.maps = {
-        text: this[type].maps[0] + "\n" + this[type].maps[1],
+        text: this[sType].maps[0] + "\n" + this[sType].maps[1],
         backgroundColor: sBase.plAttr(rulesbg),
     };
     return texts;
