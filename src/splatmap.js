@@ -23,8 +23,7 @@ var SplatMap = function() {
 SplatMap.prototype.formatTime = function(time) {
     var start = null;
     var end = null;
-    var platformColor = null;
-    var timeString = null;
+    var timeText = null;
     
     function formatter(aTime) {
         var temp = "";
@@ -42,66 +41,35 @@ SplatMap.prototype.formatTime = function(time) {
         
         return temp;
     }
-    
-    if (sBase.platform == 'basalt' || sBase.platform == 'chalk'){
-        platformColor = 'darkGray';
-    }
-    else {
-        platformColor = 'black';
-    }
-    
+        
     start = formatter(this.startTime.getHours());
     end = formatter(this.endTime.getHours());
-    timeString = new UI.Text({
+    timeText = {
         text: time + " Rotation:\n" + start + " - " + end,
-        font: sBase.time.font,
-        color: sBase.time.color,
-        backgroundColor: platformColor,
-        borderColor: sBase.time.border,
-        textAlign: sBase.time.align,
-        position: sBase.time.pos,
-        size: sBase.time.size,
-    });
+    };
     
-    return timeString;
+    return timeText;
 };
 
 SplatMap.prototype.formatData = function(type) {
     var texts = {
+        type: null,
         time: null,
         rules: null,
         maps: null,
     };
+    var rulesbg = type + 'bg';
     
-    var rulesColor = "";
-    if (type == "regular") {
-        rulesColor = "green";
-    }
-    else if (type == "ranked") {
-        rulesColor = "orange";
-    }
-    
+    texts.type = type;
     texts.time = this.formatTime(this.time);
-    texts.rules = new UI.Text({
+    texts.rules = {
         text: this[type].rules + ":",
-        font: sBase.rules.font,
-        color: sBase.rules.color,
-        backgroundColor: rulesColor,
-        borderColor: sBase.rules.border,
-        textAlign: sBase.rules.align,
-        position: sBase.rules.pos,
-        size: sBase.rules.size,
-    });
-    texts.maps = new UI.Text({
+        backgroundColor: sBase.plAttr(rulesbg),
+    };
+    texts.maps = {
         text: this[type].maps[0] + "\n" + this[type].maps[1],
-        font: sBase.maps.font,
-        color: sBase.maps.color,
-        backgroundColor: rulesColor,
-        borderColor: sBase.maps.border,
-        textAlign: sBase.maps.align,
-        position: sBase.maps.pos,
-        size: sBase.maps.size,
-    });
+        backgroundColor: sBase.plAttr(rulesbg),
+    };
     return texts;
 };
 

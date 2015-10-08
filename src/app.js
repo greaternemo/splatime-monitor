@@ -21,7 +21,6 @@ sMonitor.rotateMaps();
 
 var sView = new splatView();
 sView.woomy();
-sView.splash.show();
 
 // Now we're ready to do stuff.
 
@@ -64,9 +63,8 @@ else {
     sView.window.on('click', 'up', function(e){
         sMonitor.handlePress("A");
         if (sView.viewIndex > 0) {
-            sView.hideMain();
             sView.viewIndex--;
-            sView.showMain();
+            sView.updateMain();
         }
         else {
             //console.log("Up button was clicked, already at viewIndex 0!");
@@ -76,9 +74,8 @@ else {
     sView.window.on('click', 'down', function(e){
         sMonitor.handlePress("B");
         if (sView.viewIndex < 5) {
-            sView.hideMain();
             sView.viewIndex++;
-            sView.showMain();
+            sView.updateMain();
         }
         else {
             //console.log("Down button was clicked, already at viewIndex 5!");
@@ -122,7 +119,6 @@ else {
                 }
                 else if (e.item.title == 'Splash Page') {
                     sView.woomy();
-                    sView.splash.show();
                     setTimeout(
                         function() {sView.splash.hide(); sView.splash.hide();},
                         2000
@@ -138,14 +134,12 @@ else {
         console.log("Shook the watch, forcing refresh");
         Vibe.vibrate('short');
         sView.woomy();
-        sView.splash.show();
-        sView.hideMain();
         sMonitor.rotateMaps();
-        sView.showMain();
+        sView.updateMain();
         setTimeout(function() {sView.window.show(); sView.splash.hide();}, 1000);
     });
 
     // colorize things for the initial open
-    sView.showMain();
+    sView.updateMain();
     setTimeout(function() {sView.window.show(); sView.splash.hide();}, 1000);
 }

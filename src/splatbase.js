@@ -68,14 +68,15 @@ var SplatBase = {
     
     aWindow: function (alts) {
         return new UI.Window({
-            clear: alts.clear ? alts.clear : false,
             fullscreen: alts.fullscreen ? alts.fullscreen : false,
             scrollable: alts.scrollable ? alts.scrollable : false,
             backgroundColor: alts.backgroundColor ? alts.backgroundColor : 'black',
         });
     },
     
-    status: {
+    message: {
+        fail: 'Unable to reach splatoon.ink API for maps!',
+        splatfest: 'Today is a Splatfest! Go support your team!',
         color: 'white',
         font: 'gothic-24-bold',
         align: 'center',
@@ -84,24 +85,38 @@ var SplatBase = {
     },
     
     squid: {
+        fail: 'images/squidfail.png',
+        splatfest: 'images/squidfest.png',
         pos: new Vector2(57, 0),
         size: new Vector2(28, 28),        
     },
 };
 
-SplatBase.comp = function () {
+SplatBase.plAttr = function (attr) {
     if (SplatBase.platform == "basalt" || SplatBase.platform == "chalk") {
-        return 'normal';
+        switch (attr) {
+            case 'comp':
+                return 'normal';
+            case 'timebg':
+                return 'darkGray';
+            case 'regularbg':
+                return 'green';
+            case 'rankedbg':
+                return 'orange';
+        }
     }
     else {
-        return 'or';
+        switch (attr) {
+            case 'comp':
+                return 'or';
+            case 'timebg':
+                return 'black';
+            case 'regularbg':
+                return 'white';
+            case 'rankedbg':
+                return 'white';
+        }
     }
 };
-
-SplatBase.aSplash = function () {
-    return SplatBase.aWindow({
-        fullscreen: true,
-    });
-};
-
+    
 module.exports = SplatBase;
