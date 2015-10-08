@@ -29,6 +29,16 @@
                 "type": "font"
             },
             {
+                "file": "images/squidfest.png",
+                "name": "IMAGES_SQUIDFEST_PNG",
+                "type": "png"
+            },
+            {
+                "file": "images/squidfail.png",
+                "name": "IMAGES_SQUIDFAIL_PNG",
+                "type": "png"
+            },
+            {
                 "file": "images/squidmark_logo_144x144.png",
                 "name": "IMAGES_SQUIDMARK_LOGO_144X144_PNG",
                 "type": "png"
@@ -45,7 +55,7 @@
     "shortName": "Splatime Monitor",
     "uuid": "0b4c1dc4-a1d3-446a-b239-378c43089c01",
     "versionCode": 1,
-    "versionLabel": "1.11",
+    "versionLabel": "2.0",
     "watchapp": {
         "hiddenApp": false,
         "watchface": false
