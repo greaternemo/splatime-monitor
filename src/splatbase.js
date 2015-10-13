@@ -90,6 +90,85 @@ var SplatBase = {
         pos: new Vector2(57, 0),
         size: new Vector2(28, 28),        
     },
+    
+    // Alternate declaration for testing failure/splatfest
+    
+    // triggers fail
+    badstatus: {
+        status: 403
+    },
+    
+    // triggers fail
+    baddata: {
+        status: 200,
+        responseText: JSON.stringify({
+            schedule: ['NOPE', 'NOPE', 'NOPE'],
+        })
+    },
+
+    // triggers splatfest
+    olddata: {
+        status: 200,
+        responseText: JSON.stringify({
+            "schedule":[{
+                "startTime":1444543200000,
+                "endTime": Date.now() - 86400000,
+                "regular": {
+                    "maps":[
+                        {
+                            "nameEN":"Urchin Underpass"
+                        },
+                        {
+                            "nameEN":"Blackbelly Skatepark"
+                        }
+                    ]
+                },
+                "ranked": {
+                    "maps": [
+                        {
+                            "nameEN":"Arowana Mall"
+                        },
+                        {
+                            "nameEN":"Port Mackerel"
+                        }
+                    ],
+                    "rulesEN":"Splat Zones"
+                }
+            }]
+        })
+    },
+
+    // triggers unreported maps
+    missingdata: {
+        status: 200,
+        responseText: JSON.stringify({
+            "schedule":[{
+                "startTime":1444543200000,
+                "endTime": Date.now() + 86400000,
+                "regular": {
+                    "maps":[
+                        {
+                            "nameEN":"Urchin Underpass"
+                        },
+                        {
+                            "nameEN":"Blackbelly Skatepark"
+                        }
+                    ]
+                },
+                "ranked": {
+                    "maps": [
+                        {
+                            "nameEN":"Arowana Mall"
+                        },
+                        {
+                            "nameEN":"Port Mackerel"
+                        }
+                    ],
+                    "rulesEN":"Splat Zones"
+                }
+            }]
+        })
+    },
 };
 
 SplatBase.plAttr = function (attr) {

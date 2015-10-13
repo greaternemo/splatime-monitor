@@ -28,26 +28,18 @@ var SplatMonitor = function() {
     
 };
 
-SplatMonitor.prototype.getMaps = function() {
+SplatMonitor.prototype.getMaps = function(debug) {
     
-    var xhReq = new XMLHttpRequest();
-    xhReq.open('GET', 'http://splatoon.ink/schedule.json', false);
-    xhReq.send(null);
-
-    /**
-    Alternate declaration for testing failure/splatfest
+    var xhReq = null;
     
-    var xhReq = {
-        status: 403
-    };
-    
-    var xhReq = {
-        status: 200,
-        responseText: JSON.stringify({
-            schedule: ['NOPE', 'NOPE', 'NOPE'],
-        })
-    };
-    */
+    if (debug) {
+        xhReq = debug;
+    }
+    else {
+        xhReq = new XMLHttpRequest();
+        xhReq.open('GET', 'http://splatoon.ink/schedule.json', false);
+        xhReq.send(null);
+    }
     
     if (xhReq.status == 200) {
         console.log('Success - splatoon.ink API returned status 200.');
@@ -62,19 +54,25 @@ SplatMonitor.prototype.getMaps = function() {
     var iResp = JSON.parse(xhReq.responseText);
     
     if (iResp.schedule[0].hasOwnProperty("ranked")) {
-        var iNum = 0;
-        for (iNum = 0; iNum < iResp.schedule.length; iNum++) {
-            if (iResp.schedule[iNum].regular.hasOwnProperty("rulesEN")) {
-                this.state.doRegRulesRotate = true;
+        if (iResp.schedule[0].endTime > Date.now()) {
+            var iNum = 0;
+            for (iNum = 0; iNum < iResp.schedule.length; iNum++) {
+                if (iResp.schedule[iNum].regular.hasOwnProperty("rulesEN")) {
+                    this.state.doRegRulesRotate = true;
+                }
+                else {
+                    iResp.schedule[iNum].regular.rulesEN = "Turf War";
+                }
             }
-            else {
-                iResp.schedule[iNum].regular.rulesEN = "Turf War";
-            }
+            return iResp;
         }
-        return iResp;
+        // Only return splatfest if the first set of maps you get aren't the current maps.
+        else {
+            return 'splatfest';
+        }
     }
     else {
-        return 'splatfest';
+        return 'fail';
     }
 };
 
@@ -87,8 +85,7 @@ SplatMonitor.prototype.processInkResponse = function(iResp) {
             return 'fail';
         }
         else if (data == 'splatfest') {
-            // The splatoon.ink API breaks during Splatfests, so we're compensating.
-            console.log("Bailing out due to nonstandard JSON data.");
+            console.log("Bailing out due to splatfest reponse.");
             this.state.rotation = "splatfest";
             return 'splatfest';
         }
@@ -151,6 +148,20 @@ SplatMonitor.prototype.processInkResponse = function(iResp) {
     
     this.initMaps();
     
+    var dummyMaps = {
+        startTime: '*',
+        endTime: '*',
+        regular: {
+            maps: ['No map data', 'available'],
+            rules: 'Unreported',
+        },
+        ranked: {
+            maps: ['No map data', 'available'],
+            rules: 'Unreported',
+        }
+
+    };
+    
     for (var myMap in this.mapState) {
         switch (myMap) {
             case "currMaps":
@@ -165,6 +176,7 @@ SplatMonitor.prototype.processInkResponse = function(iResp) {
                     console.log("Adding new nextMaps to rotation.");
                 }
                 else {
+                    this.nextMaps.consume(dummyMaps);
                     this.mapState.nextMaps = 'none';
                     console.log("No nextMaps to load at index 1.");
                 }
@@ -176,18 +188,19 @@ SplatMonitor.prototype.processInkResponse = function(iResp) {
                     console.log("Adding new lastMaps to rotation.");
                 }
                 else {
+                    this.lastMaps.consume(dummyMaps);
                     this.mapState.lastMaps = 'none';
                     console.log("No lastMaps to load at index 2.");
                 }
                 break;
         }
     }
-    this.lastAttempt = 'success';
+    this.state.lastAttempt = 'success';
     return;
 };
 
-SplatMonitor.prototype.rotateMaps = function() {
-    return this.processInkResponse(this.getMaps());
+SplatMonitor.prototype.rotateMaps = function(debug) {
+    return this.processInkResponse(this.getMaps(debug));
 };
 
 SplatMonitor.prototype.handlePress = function(button) {

@@ -4,7 +4,7 @@
 */
 
 var sBase = require("splatbase");
-var UI = require("ui");
+//var UI = require("ui");
 
 var SplatMap = function() {
     this.time = "";
@@ -41,12 +41,19 @@ SplatMap.prototype.formatTime = function(time) {
         
         return temp;
     }
-        
-    start = formatter(this.startTime.getHours());
-    end = formatter(this.endTime.getHours());
-    timeText = {
-        text: time + " Rotation:\n" + start + " - " + end,
-    };
+    
+    if (this.startTime == '*' && this.endTime == '*') {
+        timeText = {
+            text: time + " Rotation:\n" + "Unreported",
+        };
+    }
+    else {
+        start = formatter(this.startTime.getHours());
+        end = formatter(this.endTime.getHours());
+        timeText = {
+            text: time + " Rotation:\n" + start + " - " + end,
+        };    
+    }
     
     return timeText;
 };
@@ -63,7 +70,7 @@ SplatMap.prototype.formatData = function(sType, sTime) {
     texts.type = sType;
     texts.time = this.formatTime(sTime);
     texts.rules = {
-        text: this[sType].rules + ":",
+        text: this[sType].rules,
         backgroundColor: sBase.plAttr(rulesbg),
     };
     texts.maps = {
