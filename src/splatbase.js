@@ -256,7 +256,7 @@ SplatBase.plAttr = function(attr) {
     } else {
         switch (attr) {
             case 'comp':
-                return 'or';
+                return 'normal';
             case 'timebg':
                 return 'black';
             case 'regularbg':
