@@ -9,43 +9,28 @@
     "resources": {
         "media": [
             {
-                "file": "images/menu_icon.png",
-                "name": "IMAGE_MENU_ICON",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/logo_splash.png",
-                "name": "IMAGE_LOGO_SPLASH",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/tile_splash.png",
-                "name": "IMAGE_TILE_SPLASH",
-                "type": "bitmap"
-            },
-            {
                 "file": "fonts/UbuntuMono-Regular.ttf",
                 "name": "MONO_FONT_14",
                 "type": "font"
             },
             {
-                "file": "images/squidmark_icon.png",
+                "file": "images/squidmark_icon~rect.png",
                 "menuIcon": true,
                 "name": "IMAGES_SQUIDMARK_ICON_PNG",
                 "type": "bitmap"
             },
             {
-                "file": "images/squidmark_icon_splash.png",
+                "file": "images/squidmark_icon_splash~rect.png",
                 "name": "IMAGES_SQUIDMARK_ICON_SPLASH_PNG",
                 "type": "bitmap"
             },
             {
-                "file": "images/squidfest_icon.png",
+                "file": "images/squidfest_icon~rect.png",
                 "name": "IMAGES_SQUIDFEST_ICON_PNG",
                 "type": "bitmap"
             },
             {
-                "file": "images/squidfail_icon.png",
+                "file": "images/squidfail_icon~rect.png",
                 "name": "IMAGES_SQUIDFAIL_ICON_PNG",
                 "type": "bitmap"
             }
