@@ -11,17 +11,17 @@
             {
                 "file": "images/menu_icon.png",
                 "name": "IMAGE_MENU_ICON",
-                "type": "png"
+                "type": "bitmap"
             },
             {
                 "file": "images/logo_splash.png",
                 "name": "IMAGE_LOGO_SPLASH",
-                "type": "png"
+                "type": "bitmap"
             },
             {
                 "file": "images/tile_splash.png",
                 "name": "IMAGE_TILE_SPLASH",
-                "type": "png"
+                "type": "bitmap"
             },
             {
                 "file": "fonts/UbuntuMono-Regular.ttf",
@@ -29,33 +29,37 @@
                 "type": "font"
             },
             {
-                "file": "images/squidfest.png",
-                "name": "IMAGES_SQUIDFEST_PNG",
-                "type": "png"
-            },
-            {
-                "file": "images/squidfail.png",
-                "name": "IMAGES_SQUIDFAIL_PNG",
-                "type": "png"
-            },
-            {
-                "file": "images/squidmark_logo_144x144.png",
-                "name": "IMAGES_SQUIDMARK_LOGO_144X144_PNG",
-                "type": "png"
-            },
-            {
-                "file": "images/squidmark_logo.png",
+                "file": "images/squidmark_icon.png",
                 "menuIcon": true,
-                "name": "IMAGES_SQUIDMARK_LOGO_PNG",
-                "type": "png"
+                "name": "IMAGES_SQUIDMARK_ICON_PNG",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/squidmark_icon_splash.png",
+                "name": "IMAGES_SQUIDMARK_ICON_SPLASH_PNG",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/squidfest_icon.png",
+                "name": "IMAGES_SQUIDFEST_ICON_PNG",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/squidfail_icon.png",
+                "name": "IMAGES_SQUIDFAIL_ICON_PNG",
+                "type": "bitmap"
             }
         ]
     },
     "sdkVersion": "3",
     "shortName": "Splatime Monitor",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
     "uuid": "0b4c1dc4-a1d3-446a-b239-378c43089c01",
     "versionCode": 1,
-    "versionLabel": "2.0",
+    "versionLabel": "2.2",
     "watchapp": {
         "hiddenApp": false,
         "watchface": false
