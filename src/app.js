@@ -6,18 +6,18 @@
  */
 
 var UI = require('ui');
-//var Vector2 = require('vector2');
 var Vibe = require('ui/vibe');
-//var sMaps = require('splatmap');
 var sBase = require('splatbase');
 var splatMonitor = require('splatmonitor');
 var splatView = require('splatview');
 
-
 // go go go
+// Pull the API data
 
 var sMonitor = new splatMonitor();
 sMonitor.rotateMaps();
+
+// Show the splash screen while we prep the data.
 
 var sView = new splatView();
 sView.woomy();
@@ -36,12 +36,12 @@ function confirmData() {
         return false;
     }
 
-    // If we didn't get back data that we understand, show a Splatfest splash.
+    // If the API response didn't return splatfest === false, or if we didn't get
+    // back data that we understand, show a Splatfest splash.
     else if (sMonitor.state.lastAttempt == 'splatfest') {
         sView.showFest();
         return false;
-    }
-    else {
+    } else {
 
         // If we got a 200 from the API request AND we got back data we understand,
         // handle it.
@@ -49,13 +49,12 @@ function confirmData() {
         sMonitor.formatAll(sView);
 
         if (upflag === false) {
-            sView.window.on('click', 'up', function(e){
+            sView.mainWindow.on('click', 'up', function(e) {
                 sMonitor.handlePress("A");
                 if (sView.viewIndex > 0) {
                     sView.viewIndex--;
                     sView.updateMain();
-                }
-                else {
+                } else {
                     //console.log("Up button was clicked, already at viewIndex 0!");
                 }
             });
@@ -63,13 +62,12 @@ function confirmData() {
         }
 
         if (downflag === false) {
-            sView.window.on('click', 'down', function(e){
+            sView.mainWindow.on('click', 'down', function(e) {
                 sMonitor.handlePress("B");
                 if (sView.viewIndex < 5) {
                     sView.viewIndex++;
                     sView.updateMain();
-                }
-                else {
+                } else {
                     //console.log("Down button was clicked, already at viewIndex 5!");
                 }
             });
@@ -79,57 +77,60 @@ function confirmData() {
         // Debug menu for errors, requires secret password :3
 
         if (debugflag === false) {
-            sView.window.on('longClick', 'select', function(e) {
+            sView.mainWindow.on('longClick', 'select', function(e) {
                 if (sMonitor.state.presses.toString() == sMonitor.state.password.toString()) {
+
                     console.log("Debug password entered! Loading debug menu!");
+
                     var debugMenu = new UI.Menu({
                         sections: [{
                             title: 'Error Pages',
                             items: [{
                                 title: 'Bad Status',
                                 subtitle: 'Response !== 200',
-                            }, 
-                                    {
-                                        title: 'Bad Data',
-                                        subtitle: 'Bad JSON returned',
-                                    },
-                                    {
-                                        title: 'Old Data',
-                                        subtitle: 'Later than endTime',
-                                    },
-                                    {
-                                        title: 'Missing Data',
-                                        subtitle: 'Incomplete JSON returned',
-                                    },
-                                    {
-                                        title: 'Splash Page',
-                                        subtitle: 'Uses woomy() function',
-                                    }],
+                            }, {
+                                title: 'Bad Data',
+                                subtitle: 'Bad JSON returned',
+                            }, {
+                                title: 'Old Data',
+                                subtitle: 'Later than endTime',
+                            }, {
+                                title: 'Splatfest Data',
+                                subtitle: 'splatfest !== false',
+                            }, {
+                                title: 'Missing Data',
+                                subtitle: 'Incomplete JSON returned',
+                            }, {
+                                title: 'Splash Page',
+                                subtitle: 'Uses woomy() function',
+                            }],
                         }],
                     });
 
                     debugMenu.on('select', function(e) {
-                        // These need to be extended to mock the fail conditions.
+                        // These options use sBase data to mock the fail conditions.
                         if (e.item.title == 'Bad Status') {
                             sMonitor.rotateMaps(sBase.badstatus);
                             confirmData();
-                        }
-                        else if (e.item.title == 'Bad Data') {
+                        } else if (e.item.title == 'Bad Data') {
                             sMonitor.rotateMaps(sBase.baddata);
                             confirmData();
-                        }
-                        else if (e.item.title == 'Old Data') {
+                        } else if (e.item.title == 'Old Data') {
                             sMonitor.rotateMaps(sBase.olddata);
                             confirmData();
-                        }
-                        else if (e.item.title == 'Missing Data') {
+                        } else if (e.item.title == 'Splatfest Data') {
+                            sMonitor.rotateMaps(sBase.splatfestdata);
+                            confirmData();
+                        } else if (e.item.title == 'Missing Data') {
                             sMonitor.rotateMaps(sBase.missingdata);
                             confirmData();
-                        }
-                        else if (e.item.title == 'Splash Page') {
+                        } else if (e.item.title == 'Splash Page') {
                             sView.woomy();
                             setTimeout(
-                                function() {sView.splash.hide(); sView.splash.hide();},
+                                function() {
+                                    sView.splash.hide();
+                                    sView.splash.hide();
+                                },
                                 2000
                             );
                         }
@@ -142,7 +143,7 @@ function confirmData() {
         }
 
         if (shakeflag === false) {
-            sView.window.on('accelTap', function(e) {
+            sView.mainWindow.on('accelTap', function(e) {
                 console.log("Shook the watch, forcing refresh");
                 Vibe.vibrate('short');
                 sView.woomy();
@@ -154,11 +155,13 @@ function confirmData() {
                 // If we didn't get back data that we understand, show a Splatfest splash.
                 else if (sMonitor.state.lastAttempt == 'splatfest') {
                     sView.showFest();
-                }
-                else {
+                } else {
                     sMonitor.formatAll(sView);
                     sView.updateMain();
-                    setTimeout(function() {sView.window.show(); sView.splash.hide();}, 1000);
+                    setTimeout(function() {
+                        sView.mainWindow.show();
+                        sView.splash.hide();
+                    }, 1000);
                 }
             });
             shakeflag = true;
@@ -166,7 +169,10 @@ function confirmData() {
 
         // colorize things for the initial open
         sView.updateMain();
-        setTimeout(function() {sView.window.show(); sView.splash.hide();}, 1000);
+        setTimeout(function() {
+            sView.mainWindow.show();
+            sView.splash.hide();
+        }, 1000);
     }
 }
 

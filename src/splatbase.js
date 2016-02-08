@@ -1,16 +1,18 @@
 /**
-* splatbase.js
-* global values for splatime monitor
-*/
+ * splatbase.js
+ * global values for splatime monitor
+ */
 
 var UI = require('ui');
 var Vector2 = require('vector2');
 
 var SplatBase = {
-    
-    randInt: function (min, max) {
+
+    randInt: function(min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
     },
+
+    // Formatting and positioning config for time, rules, and maps display
 
     time: {
         font: "gothic-24-bold",
@@ -38,13 +40,15 @@ var SplatBase = {
         pos: new Vector2(0, 104),
         size: new Vector2(144, 44),
     },
-    
+
+    // Formatting and config for squidmark and woomy splash pages
+
     squidmark: {
         pos: new Vector2(0, 12),
         size: new Vector2(144, 144),
-        img: 'images/squidmark_logo_144x144.png',
+        img: 'SQUIDMARK_ICON_SPLASH',
     },
-    
+
     woomy: {
         color: 'white',
         font: 'bitham-30-black',
@@ -52,28 +56,35 @@ var SplatBase = {
         pos: new Vector2(0, 70),
         size: new Vector2(144, 30),
     },
-    
+
+    // Fields in the mainWindow
+
     main: ["time", "rules", "maps"],
-    
+
+    // Current watch platform, determined at startup
+
     platform: (function() {
         if (Pebble.getActiveWatchInfo) {
             console.log("Platform: " + Pebble.getActiveWatchInfo().platform);
             return Pebble.getActiveWatchInfo().platform;
-        }
-        else {
+        } else {
             console.log("Platform: aplite");
             return "aplite";
         }
     })(),
-    
-    aWindow: function (alts) {
+
+    // Shortcut for creating new windows
+
+    aWindow: function(alts) {
         return new UI.Window({
             fullscreen: alts.fullscreen ? alts.fullscreen : false,
             scrollable: alts.scrollable ? alts.scrollable : false,
             backgroundColor: alts.backgroundColor ? alts.backgroundColor : 'black',
         });
     },
-    
+
+    // Positioning and config data for fail and splatfest status splash images
+
     message: {
         fail: 'Unable to reach splatoon.ink API for maps!',
         splatfest: 'Today is a Splatfest! Go support your team!',
@@ -83,95 +94,154 @@ var SplatBase = {
         pos: new Vector2(0, 28),
         size: new Vector2(144, 140),
     },
-    
+
     squid: {
-        fail: 'images/squidfail.png',
-        splatfest: 'images/squidfest.png',
+        fail: 'SQUIDFAIL_ICON',
+        splatfest: 'SQUIDFEST_ICON',
         pos: new Vector2(57, 0),
-        size: new Vector2(28, 28),        
+        size: new Vector2(28, 28),
     },
-    
-    // Alternate declaration for testing failure/splatfest
-    
-    // triggers fail
+
+    // Alternate declarations for testing failure or splatfest
+
+    // Triggers fail status with bad HTTP request status
     badstatus: {
         status: 403
     },
-    
-    // triggers fail
+
+    // Triggers fail status with schedule[0].hasOwnProperty('ranked') === false
     baddata: {
         status: 200,
         responseText: JSON.stringify({
             schedule: ['NOPE', 'NOPE', 'NOPE'],
+            splatfest: false,
         })
     },
 
-    // triggers splatfest
+    // Triggers splatfest status with Date.now() > endTime
     olddata: {
         status: 200,
         responseText: JSON.stringify({
-            "schedule":[{
-                "startTime":1444543200000,
-                "endTime": Date.now() - 86400000,
-                "regular": {
-                    "maps":[
-                        {
-                            "nameEN":"Urchin Underpass"
+            schedule: [{
+                startTime: 1444543200000,
+                endTime: Date.now() - 86400000,
+                regular: {
+                    maps: [{
+                        name: {
+                            en: "Urchin Underpass",
                         },
-                        {
-                            "nameEN":"Blackbelly Skatepark"
-                        }
-                    ]
+                    }, {
+                        name: {
+                            en: "Blackbelly Skatepark",
+                        },
+                    }],
+                    rules: {
+                        en: "Turf War",
+                    }
                 },
-                "ranked": {
-                    "maps": [
-                        {
-                            "nameEN":"Arowana Mall"
+                ranked: {
+                    maps: [{
+                        name: {
+                            en: "Arowana Mall",
                         },
-                        {
-                            "nameEN":"Port Mackerel"
-                        }
-                    ],
-                    "rulesEN":"Splat Zones"
-                }
-            }]
+                    }, {
+                        name: {
+                            en: "Port Mackerel",
+                        },
+                    }],
+                    rules: {
+                        en: "Splat Zones",
+                    }
+                },
+            }],
+            splatfest: false,
         })
     },
 
-    // triggers unreported maps
+    // Triggers splatfest status with responseText.splatfest !== false
+    splatfestdata: {
+        status: 200,
+        responseText: JSON.stringify({
+            schedule: [{
+                startTime: 1444543200000,
+                endTime: Date.now() + 86400000,
+                regular: {
+                    maps: [{
+                        name: {
+                            en: "Urchin Underpass",
+                        },
+                    }, {
+                        name: {
+                            en: "Blackbelly Skatepark",
+                        },
+                    }],
+                    rules: {
+                        en: "Turf War",
+                    }
+                },
+                ranked: {
+                    maps: [{
+                        name: {
+                            en: "Arowana Mall",
+                        },
+                    }, {
+                        name: {
+                            en: "Port Mackerel",
+                        },
+                    }],
+                    rules: {
+                        en: "Splat Zones",
+                    }
+                },
+            }],
+            splatfest: true,
+        })
+    },
+
+    // Triggers unreported maps for Next Rotation and Last Rotation
     missingdata: {
         status: 200,
         responseText: JSON.stringify({
-            "schedule":[{
-                "startTime":1444543200000,
-                "endTime": Date.now() + 86400000,
-                "regular": {
-                    "maps":[
-                        {
-                            "nameEN":"Urchin Underpass"
+            schedule: [{
+                startTime: 1444543200000,
+                endTime: Date.now() + 86400000,
+                regular: {
+                    maps: [{
+                        name: {
+                            en: "Urchin Underpass",
                         },
-                        {
-                            "nameEN":"Blackbelly Skatepark"
-                        }
-                    ]
+                    }, {
+                        name: {
+                            en: "Blackbelly Skatepark",
+                        },
+                    }],
+                    rules: {
+                        en: "Turf War",
+                    }
                 },
-                "ranked": {
-                    "maps": [
-                        {
-                            "nameEN":"Arowana Mall"
+                ranked: {
+                    maps: [{
+                        name: {
+                            en: "Arowana Mall",
                         },
-                        {
-                            "nameEN":"Port Mackerel"
-                        }
-                    ],
-                    "rulesEN":"Splat Zones"
-                }
-            }]
+                    }, {
+                        name: {
+                            en: "Port Mackerel",
+                        },
+                    }],
+                    rules: {
+                        en: "Splat Zones",
+                    }
+                },
+            }],
+            splatfest: false,
         })
     },
 };
 
-SplatBase.plAttr = function (attr) {
+// Function to divine the current platform and return the proper color attribute values
+
+SplatBase.plAttr = function(attr) {
     if (SplatBase.platform == "basalt" || SplatBase.platform == "chalk") {
         switch (attr) {
             case 'comp':
@@ -183,8 +253,7 @@ SplatBase.plAttr = function (attr) {
             case 'rankedbg':
                 return 'orange';
         }
-    }
-    else {
+    } else {
         switch (attr) {
             case 'comp':
                 return 'or';
@@ -197,5 +266,5 @@ SplatBase.plAttr = function (attr) {
         }
     }
 };
-    
+
 module.exports = SplatBase;

@@ -1,26 +1,26 @@
 /**
-* splatview.js
-* ui object to hold windows and visual elements
-*/
+ * splatview.js
+ * ui object to hold windows and visual elements
+ */
 
 var UI = require('ui');
 var sBase = require('splatbase');
 
 var SplatView = function() {
     this.viewIndex = 0;
-    this.window = sBase.aWindow({
-        //clear: true,
-    });
+
+    this.mainWindow = sBase.aWindow({});
+
     this.splash = null;
-    this.woomysplash = sBase.aWindow({
+    this.woomySplash = sBase.aWindow({
         fullscreen: true,
     });
-    this.squidmarksplash = sBase.aWindow({
+    this.squidmarkSplash = sBase.aWindow({
         fullscreen: true,
     });
-    this.status = sBase.aWindow({
-        //clear: true,
-    });
+
+    this.status = sBase.aWindow({});
+
     this.elems = {
         squidmark: new UI.Image({
             image: sBase.squidmark.img,
@@ -73,20 +73,32 @@ var SplatView = function() {
             size: sBase.squid.size,
         }),
     };
+
     this.views = [null, null, null, null, null, null];
-    
-    this.window.add(this.elems.time);
-    this.window.add(this.elems.rules);
-    this.window.add(this.elems.maps);
-    
-    this.woomysplash.add(this.elems.woomy);
-    this.squidmarksplash.add(this.elems.squidmark);
-    
+
+    // This is how I eventually figured out how to get all this work.
+    // There are 4 windows: mainWindow, woomySplash, squidmarkSplash, and status
+    // The squidmarkSplash window is static.
+    // The woomySplash window is dynamic and is randomly used as the splash screen
+    // instead of the squidmarkSplash window.
+    // The status window is dynamic and is used to display messages in the event of
+    // API failure or Splatfests.
+    // The mainWindow window holds the time, rules, and maps elements. When a user
+    // scrolls up and down through the current maps, the mainWindow elements are
+    // updated to display the info at the current viewIndex.
+
+    this.mainWindow.add(this.elems.time);
+    this.mainWindow.add(this.elems.rules);
+    this.mainWindow.add(this.elems.maps);
+
+    this.woomySplash.add(this.elems.woomy);
+    this.squidmarkSplash.add(this.elems.squidmark);
+
     this.status.add(this.elems.message);
     this.status.add(this.elems.squid);
 };
 
-SplatView.prototype.updateMain = function () {
+SplatView.prototype.updateMain = function() {
     //console.log("Showing view elements at index " + this.viewIndex);
     for (var i = 0; i < sBase.main.length; i++) {
         for (var mapKey in this.views[this.viewIndex][sBase.main[i]]) {
@@ -95,43 +107,45 @@ SplatView.prototype.updateMain = function () {
     }
 };
 
-SplatView.prototype.showFail = function () {
+// Shows status splash pages in the event of API failure or Splatfest events
+
+SplatView.prototype.showFail = function() {
     this.showStatus('fail');
 };
 
-SplatView.prototype.showFest = function () {
+SplatView.prototype.showFest = function() {
     this.showStatus('splatfest');
 };
 
-SplatView.prototype.showStatus = function (state) {
+SplatView.prototype.showStatus = function(state) {
     this.elems.message.text(sBase.message[state]);
     this.elems.squid.image(sBase.squid[state]);
     this.status.show();
     this.splash.hide();
 };
 
-SplatView.prototype.woomy = function () {
+// Generates random splash pages
+
+SplatView.prototype.woomy = function() {
     var seed = sBase.randInt(1, 15);
     var bonus = sBase.randInt(1, 5);
-    
+
     if (seed == 4 && bonus == 2) {
         console.log("seed == 4, bonus == 2, BOOTY!");
-        this.splash = this.woomysplash;
+        this.splash = this.woomySplash;
         this.elems.woomy.text('BOOTY!');
-    }
-    else if (seed == 7) {
+    } else if (seed == 7) {
         console.log("seed == 7, WOOMY!");
-        this.splash = this.woomysplash;
+        this.splash = this.woomySplash;
         this.elems.woomy.text('WOOMY!');
-    }
-    else if (seed == 13) {
+    } else if (seed == 13) {
         console.log("seed == 13, NGYES!");
-        this.splash = this.woomysplash;
+        this.splash = this.woomySplash;
         this.elems.woomy.text('NGYES!');
+    } else {
+        this.splash = this.squidmarkSplash;
     }
-    else {
-        this.splash = this.squidmarksplash;
-    }
+
     this.splash.show();
 };
 

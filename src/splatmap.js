@@ -1,10 +1,9 @@
 /**
-* splatmap.js
-* object containing scheduled map info and formatting methods
-*/
+ * splatmap.js
+ * object containing scheduled map info and formatting methods
+ */
 
 var sBase = require("splatbase");
-//var UI = require("ui");
 
 var SplatMap = function() {
     this.time = "";
@@ -24,37 +23,35 @@ SplatMap.prototype.formatTime = function(time) {
     var start = null;
     var end = null;
     var timeText = null;
-    
+
     function formatter(aTime) {
         var temp = "";
-        
+
         if (aTime === 0) {
             aTime += 12;
         }
-        
+
         if (aTime > 12) {
-            temp = aTime-12 + " PM";
-        }
-        else {
+            temp = aTime - 12 + " PM";
+        } else {
             temp = aTime + " AM";
         }
-        
+
         return temp;
     }
-    
+
     if (this.startTime == '*' && this.endTime == '*') {
         timeText = {
             text: time + " Rotation:\n" + "Unreported",
         };
-    }
-    else {
+    } else {
         start = formatter(this.startTime.getHours());
         end = formatter(this.endTime.getHours());
         timeText = {
             text: time + " Rotation:\n" + start + " - " + end,
-        };    
+        };
     }
-    
+
     return timeText;
 };
 
@@ -66,7 +63,7 @@ SplatMap.prototype.formatData = function(sType, sTime) {
         maps: null,
     };
     var rulesbg = sType + 'bg';
-    
+
     texts.type = sType;
     texts.time = this.formatTime(sTime);
     texts.rules = {
@@ -80,20 +77,6 @@ SplatMap.prototype.formatData = function(sType, sTime) {
     return texts;
 };
 
-// These are for dumping one schedule's data into another.
-// Usage:
-// prevMaps.consume(currMaps.feed());
-// currMaps.consume(nextMaps.feed());
-// nextMaps.consume(lastMaps.feed());
-
-SplatMap.prototype.feed = function() {
-    return {
-        startTime: this.startTime,
-        endTime: this.endTime,
-        regular: this.regular,
-        ranked: this.ranked,
-    };
-};
 SplatMap.prototype.consume = function(mapsData) {
     for (var dataKey in mapsData) {
         this[dataKey] = mapsData[dataKey];
