@@ -27,68 +27,70 @@ var SplatMonitor = function() {
 
 };
 
-// API info, projected 2.2 release, written 7 Feb 2016
+/*
+API info, projected 2.2 release, written 7 Feb 2016
 
-// My original releases used an older version of the Splatoon.ink API, which I abide by.
-// Since the function and structure of the API is totally out of my hands, from here I
-// plan to document the structure I'm using: which data, with which name. For what I can
-// only assume is legacy support, the Splatoon.ink API now has a TON of duplicate info.
-// We only need a bare subset of that info, and at this point most of it has been very
-// neatly enumerated from the older forms with a structure that wasn't as deep but had a
-// less user-friendly name scheme. 
+My original releases used an older version of the Splatoon.ink API, which I abide by.
+Since the function and structure of the API is totally out of my hands, from here I
+plan to document the structure I'm using: which data, with which name. For what I can
+only assume is legacy support, the Splatoon.ink API now has a TON of duplicate info.
+We only need a bare subset of that info, and at this point most of it has been very
+neatly enumerated from the older forms with a structure that wasn't as deep but had a
+less user-friendly name scheme. 
 
-// {
-//     "updateTime": <Date>,
-//     "schedule": [
-//         {
-//             "startTime": <Date>,
-//             "endTime": <Date>,
-//             "regular": {
-//                 "maps": [
-//                     {
-//                         "name": {
-//                             "en": <string>,
-//                             "jp": <string>,
-//                         },
-//                     },
-//                     {
-//                         "name": {
-//                             "en": <string>,
-//                             "jp": <string>,
-//                         },
-//                     },
-//                 ],
-//                 "rules": {
-//                     "en": <string>,
-//                     "jp": <string>,
-//                 }
-//             },
-//             "ranked": {
-//                 "maps": [
-//                     {
-//                         "name": {
-//                             "en": <string>,
-//                             "jp": <string>,
-//                         },
-//                     },
-//                     {
-//                         "name": {
-//                             "en": <string>,
-//                             "jp": <string>,
-//                         },
-//                     },
-//                 ],
-//                 "rules": {
-//                     "en": <string>,
-//                     "jp": <string>,
-//                 }
-//             },
-//         },
-//         {IDENTICAL STRUCTURE},
-//         {IDENTICAL STRUCTURE},
-//     ],
-//     "splatfest": <bool>
-// }
+{
+    "updateTime": <Date>,
+    "schedule": [
+        {
+            "startTime": <Date>,
+            "endTime": <Date>,
+            "regular": {
+                "maps": [
+                    {
+                        "name": {
+                            "en": <string>,
+                            "jp": <string>,
+                        },
+                    },
+                    {
+                        "name": {
+                            "en": <string>,
+                            "jp": <string>,
+                        },
+                    },
+                ],
+                "rules": {
+                    "en": <string>,
+                    "jp": <string>,
+                }
+            },
+            "ranked": {
+                "maps": [
+                    {
+                        "name": {
+                            "en": <string>,
+                            "jp": <string>,
+                        },
+                    },
+                    {
+                        "name": {
+                            "en": <string>,
+                            "jp": <string>,
+                        },
+                    },
+                ],
+                "rules": {
+                    "en": <string>,
+                    "jp": <string>,
+                }
+            },
+        },
+        {IDENTICAL STRUCTURE},
+        {IDENTICAL STRUCTURE},
+    ],
+    "splatfest": <bool>
+}
+*/
 
 SplatMonitor.prototype.getMaps = function(debug) {
 
@@ -151,28 +153,12 @@ SplatMonitor.prototype.processInkResponse = function(iResp) {
             return 'fail';
         }
 
-        //var pullEN = function(info, opt) {
-        //    var temp = [];
-        //    var ident = opt + "EN";
-        //    if (info.hasOwnProperty("length")) {
-        //        for (var i = 0; i < info.length; i++) {
-        //            temp.push(info[i][ident]);
-        //        }
-        //    }
-        //    else {
-        //        temp = info[ident];
-        //    }
-        //    return temp;
-        //};
-
         for (var iMap = 0; iMap < data.schedule.length; iMap++) {
             newData.push(new sMap());
             newData[iMap].consume({
                 startTime: new Date(data.schedule[iMap].startTime),
                 endTime: new Date(data.schedule[iMap].endTime),
                 regular: {
-                    //maps: pullEN(data.schedule[iMap].regular.maps, "name"),
-                    //rules: pullEN(data.schedule[iMap].regular, "rules"),
                     maps: [
                         data.schedule[iMap].regular.maps[0].name.en,
                         data.schedule[iMap].regular.maps[1].name.en,
@@ -180,8 +166,6 @@ SplatMonitor.prototype.processInkResponse = function(iResp) {
                     rules: data.schedule[iMap].regular.rules.en,
                 },
                 ranked: {
-                    //maps: pullEN(data.schedule[iMap].ranked.maps, "name"),
-                    //rules: pullEN(data.schedule[iMap].ranked, "rules"),
                     maps: [
                         data.schedule[iMap].ranked.maps[0].name.en,
                         data.schedule[iMap].ranked.maps[1].name.en,
