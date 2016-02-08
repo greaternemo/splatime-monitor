@@ -14,23 +14,23 @@
                 "type": "font"
             },
             {
-                "file": "images/squidmark_icon~rect.png",
+                "file": "images/squidmark_icon.png",
                 "menuIcon": true,
                 "name": "IMAGES_SQUIDMARK_ICON_PNG",
                 "type": "bitmap"
             },
             {
-                "file": "images/squidmark_icon_splash~rect.png",
+                "file": "images/squidmark_icon_splash.png",
                 "name": "IMAGES_SQUIDMARK_ICON_SPLASH_PNG",
                 "type": "bitmap"
             },
             {
-                "file": "images/squidfest_icon~rect.png",
+                "file": "images/squidfest_icon.png",
                 "name": "IMAGES_SQUIDFEST_ICON_PNG",
                 "type": "bitmap"
             },
             {
-                "file": "images/squidfail_icon~rect.png",
+                "file": "images/squidfail_icon.png",
                 "name": "IMAGES_SQUIDFAIL_ICON_PNG",
                 "type": "bitmap"
             }
