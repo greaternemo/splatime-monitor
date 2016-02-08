@@ -46,7 +46,7 @@ var SplatBase = {
     squidmark: {
         pos: new Vector2(0, 12),
         size: new Vector2(144, 144),
-        img: 'SQUIDMARK_ICON_SPLASH',
+        img: 'IMAGES_SQUIDMARK_ICON_SPLASH',
     },
 
     woomy: {
@@ -96,8 +96,8 @@ var SplatBase = {
     },
 
     squid: {
-        fail: 'SQUIDFAIL_ICON',
-        splatfest: 'SQUIDFEST_ICON',
+        fail: 'IMAGES_SQUIDFAIL_ICON',
+        splatfest: 'IMAGES_SQUIDFEST_ICON',
         pos: new Vector2(57, 0),
         size: new Vector2(28, 28),
     },
